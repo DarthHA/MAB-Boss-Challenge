@@ -1,0 +1,3 @@
+displayName = MAB Boss Challenge
+author = Volknet_Online(ÍøÂçºËĞÄ)
+version = 0.1
