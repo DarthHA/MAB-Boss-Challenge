@@ -88,8 +88,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
         public override void Kill(int timeLeft)
         {
             projectile.ai[0] = 86f;
-            int num3;
-            for (int num113 = 0; num113 < 10; num113 = num3 + 1)
+            for (int num113 = 0; num113 < 10; num113++)
             {
                 int num114 = Dust.NewDust(new Vector2(projectile.position.X, projectile.position.Y), projectile.width, projectile.height, (int)projectile.ai[0], projectile.velocity.X * 0.1f, projectile.velocity.Y * 0.1f, 0, default, 0.5f);
                 Dust dust;
@@ -99,8 +98,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
                     Main.dust[num114].scale = 0.25f + Main.rand.Next(-10, 11) * 0.005f;
                     dust = Main.dust[num114];
                     Dust dust15 = dust;
-                    num3 = dust.type;
-                    dust15.type = num3 + 1;
+                    dust15.type++;
                 }
                 else
                 {
@@ -111,7 +109,6 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
                 dust.velocity *= 1.25f;
                 dust = Main.dust[num114];
                 dust.velocity -= projectile.oldVelocity / 10f;
-                num3 = num113;
             }
         }
 
@@ -127,5 +124,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
             return false;
         }
 
+
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
+        }
     }
 }

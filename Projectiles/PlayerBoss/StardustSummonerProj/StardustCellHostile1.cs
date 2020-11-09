@@ -14,6 +14,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
         {
             DisplayName.SetDefault("Stardust Cell");
             DisplayName.AddTranslation(GameCulture.Chinese, "星尘细胞");
+            Main.projFrames[projectile.type] = 4;
         }
         public override void SetDefaults()
         {
@@ -100,7 +101,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
         {
             target.AddBuff(ModContent.BuffType<ImprovedCelledBuff>(), 240);
         }
-
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            target.AddBuff(ModContent.BuffType<ImprovedCelledBuff>(), 240);
+        }
         public void SwarmAI()
         {
             foreach (Projectile proj in Main.projectile)
@@ -122,6 +126,9 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
                 Main.dust[dust].velocity = (Main.rand.NextFloat() * MathHelper.TwoPi).ToRotationVector2() * 3;
             }
         }
-
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
+        }
     }
 }

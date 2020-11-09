@@ -109,5 +109,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
             Main.dust[dust].velocity *= 2f;
         }
 
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
+        }
+
     }
 }

@@ -17,8 +17,8 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
         public override void SetDefaults()
         {
             projectile.alpha = 255;
-            projectile.width = 18;
-            projectile.height = 28;
+            projectile.width = 20;
+            projectile.height = 20;
             projectile.aiStyle = -1;
             projectile.timeLeft = 300;
             projectile.tileCollide = false;
@@ -38,15 +38,35 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
             }
             if (projectile.ai[1] > 40)
             {
-                Vector2 MoveVel = Vector2.Normalize(Main.player[projectile.owner].Center - projectile.Center);
-                MoveVel *= 5;
-                projectile.velocity = (projectile.velocity * 75 + MoveVel * 6) / 80;
+                if (projectile.ai[0] == 0)
+                {
+                    Vector2 MoveVel = Vector2.Normalize(Main.player[projectile.owner].Center - projectile.Center);
+                    MoveVel *= 5;
+                    projectile.velocity = (projectile.velocity * 75 + MoveVel * 6) / 80;
+                }
+                else
+                {
+                    Vector2 Target = new Vector2(projectile.localAI[0], projectile.localAI[1]);
+                    Vector2 MoveVel = Vector2.Normalize(Target - projectile.Center);
+                    MoveVel *= 5;
+                    projectile.velocity = (projectile.velocity * 75 + MoveVel * 6) / 80;
+                    if (projectile.Distance(Target) < 5)
+                    {
+                        projectile.Kill();
+                    }
+                }
             }
         }
         public override bool CanDamage()
         {
-            if (projectile.ai[1] < 40) return false;
-            return true;
+            if (projectile.ai[0] == 0)
+            {
+                return projectile.ai[1] >= 40;
+            }
+            else
+            {
+                return projectile.ai[1] >= 10;
+            }
         }
         public override void OnHitPlayer(Player target, int damage, bool crit)
         {
@@ -65,6 +85,14 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
             Texture2D tex = Main.projectileTexture[projectile.type];
             spriteBatch.Draw(tex, projectile.Center - Main.screenPosition, TexFrame, Color.White * projectile.Opacity, 0, TexFrame.Size() * 0.5f, 1, SpriteEffects.None, 0);
             return false;
+        }
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
+        }
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            target.AddBuff(ModContent.BuffType<LifeFlare>(), 300);
         }
     }
 }

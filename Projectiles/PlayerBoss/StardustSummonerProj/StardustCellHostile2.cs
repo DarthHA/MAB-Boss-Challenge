@@ -14,6 +14,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
         {
             DisplayName.SetDefault("Smaller Stardust Cell");
             DisplayName.AddTranslation(GameCulture.Chinese, "小星尘细胞");
+            Main.projFrames[projectile.type] = 4;
         }
         public override void SetDefaults()
         {
@@ -78,7 +79,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
         {
             target.AddBuff(ModContent.BuffType<ImprovedCelledBuff>(), 240);
         }
-
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            target.AddBuff(ModContent.BuffType<ImprovedCelledBuff>(), 240);
+        }
 
         public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
         {
@@ -97,6 +101,11 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
 
 
             return false;
+        }
+
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
         }
     }
 }

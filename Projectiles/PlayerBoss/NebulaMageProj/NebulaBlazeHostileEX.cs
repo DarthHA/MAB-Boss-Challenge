@@ -8,7 +8,7 @@ using Terraria.ModLoader;
 
 namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
 {
-    public class NebulaBlazeHostile : ModProjectile
+    public class NebulaBlazeHostileEX : ModProjectile
     {
 
         public override void SetStaticDefaults()
@@ -33,16 +33,16 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
         public override void AI()
         {
 
-            bool IsBlazeEX = (projectile.ai[0] == 1);
             Player target = Main.player[projectile.owner];
             projectile.tileCollide = Collision.CanHitLine(projectile.position, projectile.width, projectile.height, target.position, target.width, target.height);
 
-            if (++projectile.localAI[1] < 45 * projectile.MaxUpdates)  //home
+            if (++projectile.localAI[1] < 85 * projectile.MaxUpdates)  //home
             {
                 float rotation = projectile.velocity.ToRotation();
                 Vector2 vel = Main.player[projectile.owner].Center - projectile.Center;
                 float targetAngle = vel.ToRotation();
-                projectile.velocity = new Vector2(projectile.velocity.Length(), 0f).RotatedBy(rotation.AngleLerp(targetAngle, 0.0175f));
+                projectile.velocity = new Vector2(projectile.velocity.Length(), 0f).RotatedBy(rotation.AngleLerp(targetAngle, 0.016f));
+                projectile.tileCollide = false;
             }
 
             float num1 = 5f;
@@ -130,16 +130,8 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
                         Main.dust[index2].fadeIn = 1.4f;
                 }
             }
-            if (Main.rand.Next(12) == 0 && !IsBlazeEX)
-            {
-                Vector2 vector2_2 = -Vector2.UnitX.RotatedByRandom(0.196349546313286).RotatedBy(projectile.velocity.ToRotation(), new Vector2());
-                int index = Dust.NewDust(projectile.position, projectile.width, projectile.height, Type2, 0.0f, 0.0f, 100, new Color(), 1f);
-                Main.dust[index].velocity *= 0.3f;
-                Main.dust[index].position = projectile.Center + vector2_2 * projectile.width / 2f;
-                Main.dust[index].fadeIn = 0.9f;
-                Main.dust[index].noGravity = true;
-            }
-            if (Main.rand.Next(3) == 0 && IsBlazeEX)
+
+            if (Main.rand.Next(3) == 0)
             {
                 Vector2 vector2_2 = -Vector2.UnitX.RotatedByRandom(0.196349546313286).RotatedBy(projectile.velocity.ToRotation(), new Vector2());
                 int index = Dust.NewDust(projectile.position, projectile.width, projectile.height, Type2, 0.0f, 0.0f, 100, new Color(), 1f);
@@ -154,35 +146,23 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
 
         public override void Kill(int timeLeft) //vanilla explosion code echhhhhhhhhhh
         {
-            bool IsBlazeEX = false;
-            if ((int)projectile.ai[0] == 1) IsBlazeEX = true;
-            int Type1 = 255;
-            int Type2 = 255;
+            int Type1 = 88;
+            int Type2 = 88;
             int num2 = 50;
-            float Scale1 = 1.7f;
-            float Scale2 = 0.8f;
-            float Scale3 = 2f;
+            float Scale1 = 3.7f;
+            float Scale2 = 1.5f;
+            float Scale3 = 2.2f;
             Vector2 vector2 = (projectile.rotation - MathHelper.Pi / 2).ToRotationVector2() * projectile.velocity.Length() * projectile.MaxUpdates;
-            if (IsBlazeEX)
-            {
-                Type1 = 88;
-                Type2 = 88;
-                Scale1 = 3.7f;
-                Scale2 = 1.5f;
-                Scale3 = 2.2f;
-                vector2 *= 0.5f;
-            }
+            vector2 *= 0.5f;
+            
             Main.PlaySound(SoundID.Item14, projectile.position);
             projectile.position = projectile.Center;
             projectile.width = projectile.height = num2;
             projectile.Center = projectile.position;
             for (int index1 = 0; index1 < 40; ++index1)
             {
-                int Type3 = RandomSelect();
-                if (IsBlazeEX)
-                {
-                    Type3 = RandomSelect2();
-                }
+                int Type3 = RandomSelect2();
+                
                 int index2 = Dust.NewDust(new Vector2(projectile.position.X, projectile.position.Y), projectile.width, projectile.height, Type3, 0.0f, 0.0f, 200, new Color(), Scale1);
                 Main.dust[index2].position = projectile.Center + Vector2.UnitY.RotatedByRandom(3.14159274101257) * (float)Main.rand.NextDouble() * projectile.width / 2f;
                 Main.dust[index2].noGravity = true;
@@ -220,8 +200,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
 
         public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
         {
-            Texture2D texture2D13 = MABBossChallenge.Instance.GetTexture("Projectiles/PlayerBoss/NebulaMageProj/NebulaBlazeHostile1");
-            if (projectile.ai[0] == 1) texture2D13 = MABBossChallenge.Instance.GetTexture("Projectiles/PlayerBoss/NebulaMageProj/NebulaBlazeHostile2");
+            Texture2D texture2D13 = Main.projectileTexture[projectile.type];
             int num156 = texture2D13.Height / 4; //ypos of lower right corner of sprite to draw
             int y3 = num156 * projectile.frame; //ypos of upper left corner of sprite to draw
             Rectangle rectangle = new Rectangle(0, y3, texture2D13.Width, num156);

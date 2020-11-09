@@ -235,5 +235,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
             spriteBatch.Draw(Tex, projectile.Center - Main.screenPosition, Frame, color29, 0, new Vector2(54, 46), projectile.scale, SP, 0f);
             return false;
         }
+
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
+        }
     }
 }
