@@ -30,8 +30,7 @@ namespace MABBossChallenge
 
         public override void Load()
         {
-
-            AmmoChangeKey = RegisterHotKey("手动换弹键", "Z");
+            AmmoChangeKey = RegisterHotKey("Swap Ammo Key", "Z");
 
             Filters.Scene["MABBossChallenge:VortexBossSky"] = new Filter(new CustomScreenShaderData("FilterMiniTower").UseColor(0.255f, 0f, 0f).UseOpacity(0.2f), EffectPriority.VeryHigh);
             SkyManager.Instance["MABBossChallenge:VortexBossSky"] = new VortexBossSky();
@@ -49,7 +48,7 @@ namespace MABBossChallenge
 
         public override void PostSetupContent()
         {
-            Main.versionNumber = "Terraria v3.3.5";
+            Main.versionNumber = "Ech";
 
             //联动BCL
             AddToBCL();
@@ -101,6 +100,12 @@ namespace MABBossChallenge
             TranslationUtils.AddTranslation("GenerateBattleWarning", "Detecting that this world hasn't generate Battlefield. Try using the Battlefield Generator to generate one!", "检测到该世界没有生成战场！尝试使用战场生成器来创建一个！");
             TranslationUtils.AddTranslation("MeteorGuardianNPCName", "No-Name", "无名");
             TranslationUtils.AddTranslation("TrueFight", "The real battle has just begun...", "真正的战斗才刚刚开始...");
+
+            TranslationUtils.AddTranslation("GuardianBro", "Evil Guardian Borthers", "邪恶守护者兄弟");
+            TranslationUtils.AddTranslation("GuardianBroDescription", "Duo from the Evils", "来自邪恶之地的二重奏");
+
+            TranslationUtils.AddTranslation("SolarFlareDeath", " was melted by the power of solar flare.", "被日耀之炎融化了。");
+            TranslationUtils.AddTranslation("JJDeath", "'s soul received the fair result of the Judgement.", "灵魂得到了公正的的判决。");
         }
 
         private void AddToBCL()
@@ -350,7 +355,7 @@ namespace MABBossChallenge
                 mod1.Call(array);
 
 
-                /*
+                
                 mod1 = bossChecklist;
                 array = new object[12];
                 array[0] = "AddBoss";
@@ -362,8 +367,7 @@ namespace MABBossChallenge
                 array[6] = ModContent.ItemType<PlayerSummon3>();
                 array[7] = new List<int>
                 {
-                    //ItemID.DestroyerMask,
-                    //ItemID.DestroyerTrophy,
+
                 };
                 array[8] = new List<int>
                 {
@@ -381,7 +385,7 @@ namespace MABBossChallenge
                 array[11] = "MABBossChallenge/BossChecklist/NebulaMage_BCL";
                 mod1.Call(array);
 
-                */
+                
             }
         }
 

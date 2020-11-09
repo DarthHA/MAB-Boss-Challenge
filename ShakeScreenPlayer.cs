@@ -26,24 +26,27 @@ namespace MABBossChallenge
 
         public override void ModifyScreenPosition()
         {
-            if (this.shake)
+            if (MABBossChallenge.mabconfig.BossFightFilters)
             {
-                Main.screenPosition.X += Main.rand.Next(-10, 11);
-                Main.screenPosition.Y += Main.rand.Next(-10, 11);
-            }
-            if (this.shakeMega)
-            {
-                Main.screenPosition.X += Main.rand.Next(-20, 21);
-                Main.screenPosition.Y += Main.rand.Next(-20, 21);
-            }
-            if (this.shakeSubtle)
-            {
-                Main.screenPosition.X += Main.rand.Next(-3, 3);
-                Main.screenPosition.Y += Main.rand.Next(-3, 3);
-            }
-            if (this.shakeQuake)
-            {
-                Main.screenPosition.Y += Main.rand.Next(-5, 5);
+                if (this.shake)
+                {
+                    Main.screenPosition.X += Main.rand.Next(-10, 11);
+                    Main.screenPosition.Y += Main.rand.Next(-10, 11);
+                }
+                if (this.shakeMega)
+                {
+                    Main.screenPosition.X += Main.rand.Next(-20, 21);
+                    Main.screenPosition.Y += Main.rand.Next(-20, 21);
+                }
+                if (this.shakeSubtle)
+                {
+                    Main.screenPosition.X += Main.rand.Next(-3, 3);
+                    Main.screenPosition.Y += Main.rand.Next(-3, 3);
+                }
+                if (this.shakeQuake)
+                {
+                    Main.screenPosition.Y += Main.rand.Next(-5, 5);
+                }
             }
         }
 

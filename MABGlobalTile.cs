@@ -1,5 +1,6 @@
-using MABBossChallenge.NPCs;
+﻿using MABBossChallenge.NPCs;
 using MABBossChallenge.NPCs.MiniPlayerBoss;
+using MABBossChallenge.NPCs.PlayerBoss;
 using MABBossChallenge.Tiles;
 using MABBossChallenge.Walls;
 using Terraria;
@@ -20,7 +21,7 @@ namespace MABBossChallenge
             }
             return true;
         }
-
+        
 
         public override bool CanKillTile(int i, int j, int type, ref bool blockDamaged)
         {
@@ -46,6 +47,11 @@ namespace MABBossChallenge
         public override bool PreHitWire(int i, int j, int type)
         {
             if (!MABWorld.DownedPreEvilFighter && Main.tile[i, j].type == ModContent.TileType<ArenaTile>()) return false;
+            if (NPC.AnyNPCs(ModContent.NPCType<SolarFighterBoss>()) || NPC.AnyNPCs(ModContent.NPCType<VortexRangerBoss>()) ||
+                NPC.AnyNPCs(ModContent.NPCType<NebulaMageBoss>()) || NPC.AnyNPCs(ModContent.NPCType<StardustSummonerBoss>()))
+            {
+                return false;
+            }
             return true;
         }
 

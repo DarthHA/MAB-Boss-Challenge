@@ -1,4 +1,3 @@
-
 using MABBossChallenge.Buffs;
 using MABBossChallenge.Items;
 using MABBossChallenge.NPCs;
@@ -6,7 +5,9 @@ using MABBossChallenge.NPCs.MiniPlayerBoss;
 using MABBossChallenge.NPCs.PlayerBoss;
 using MABBossChallenge.Utils;
 using Microsoft.Xna.Framework;
+using System.Linq;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -15,6 +16,7 @@ namespace MABBossChallenge
 
     public class MABPlayer : ModPlayer
     {
+        public bool JJEffect = false;      //正裁效果
         public bool DamageFlare = false;   //伤害火焰
         public bool LifeFlare = false;     //生命火焰
         public bool ManaFlare = false;     //魔力火焰
@@ -22,10 +24,6 @@ namespace MABBossChallenge
         public bool ImprovedCelled = false;   //寄生
         public int CurrentHealth = 10000;    //寄生血量
 
-        public float ShaderTime = 0;
-
-
-        // public float ShaderTime = 0;
 
         public override void ResetEffects()
         {
@@ -36,11 +34,12 @@ namespace MABBossChallenge
             ManaFlare = false;
             LifeFlare = false;
             ImprovedCelled = false;
+            JJEffect = false;
         }
 
         public override void UpdateDead()
         {
-
+            JJEffect = false;
             DamageFlare = false;
             ManaFlare = false;
             LifeFlare = false;
@@ -53,6 +52,7 @@ namespace MABBossChallenge
 
         public override void ModifyHitByProjectile(Projectile proj, ref int damage, ref bool crit)
         {
+
             int TowerPunishment = 1;
             if (!MABWorld.DownedNebulaPlayer && !player.ZoneTowerNebula && NPC.AnyNPCs(ModContent.NPCType<NebulaMageBoss>()))
             {
@@ -70,22 +70,68 @@ namespace MABBossChallenge
             {
                 TowerPunishment = 2;
             }
+
             damage *= TowerPunishment;
 
 
+            if (JJEffect)
+            {
+
+                float[] DamageBoost = new float[5];
+                DamageBoost[0] = player.meleeDamage + (float)player.meleeCrit / 100 + player.allDamage;
+                DamageBoost[1] = player.rangedDamage + (float)player.rangedCrit / 100 + player.allDamage;
+                DamageBoost[2] = player.magicDamage + (float)player.magicCrit / 100 + player.allDamage;
+                DamageBoost[3] = player.minionDamage + (float)player.maxMinions / 5 + player.allDamage;
+                DamageBoost[4] = player.thrownDamage + (float)player.thrownCrit / 100 + player.allDamage;
+
+                int dmg = (int)(player.statLifeMax2 * 0.02f * (1 + DamageBoost.Max()) / 4);
+                if (damage - player.statDefense / 8 < dmg) 
+                {
+                    damage += player.statDefense / 8;
+                }
+                damage += dmg;
+            }
 
         }
 
 
+        public override void ModifyHitByNPC(NPC npc, ref int damage, ref bool crit)
+        {
+            if (JJEffect)
+            {
+                float[] DamageBoost = new float[5];
+                DamageBoost[0] = player.meleeDamage + (float)player.meleeCrit / 100 + player.allDamage;
+                DamageBoost[1] = player.rangedDamage + (float)player.rangedCrit / 100 + player.allDamage;
+                DamageBoost[2] = player.magicDamage + (float)player.magicCrit / 100 + player.allDamage;
+                DamageBoost[3] = player.minionDamage + (float)player.maxMinions / 5 + player.allDamage;
+                DamageBoost[4] = player.thrownDamage + (float)player.thrownCrit / 100 + player.allDamage;
+
+                int dmg = (int)(player.statLifeMax2 * 0.02f * (1 + DamageBoost.Max()) / 4);
+                if (damage - player.statDefense / 8 < dmg)
+                {
+                    damage += player.statDefense / 8;
+                }
+                damage += dmg;
+            }
+        }
+
 
         public override void PostUpdateMiscEffects()
         {
-
+            /*
+            foreach(Projectile proj in Main.projectile)
+            {
+                if(proj.active && proj.type == ProjectileID.LastPrism)
+                {
+                    Main.NewText(proj.ai[0] + " " + proj.ai[1] + " " + proj.localAI[0] + " " + proj.ai[1]);
+                }
+            }
+            */
             if (player.name == "ModTest")
             {
                 player.gravity = Player.defaultGravity;
             }
-            //Main.NewText(CrazyGCount + " " + CrazyGCD);
+
 
             if (MABBossChallenge.AmmoChangeKey.JustReleased)
             {
@@ -160,51 +206,63 @@ namespace MABBossChallenge
 
 
 
-
+        public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource)
+        {
+            if (damage == 10.0 && SolarFlare > 0)
+            {
+                damageSource = PlayerDeathReason.ByCustomReason(player.name + TranslationUtils.GetTranslation("SolarFlareDeath"));
+            }
+            if (JJEffect && damage != 10.0)
+            {
+                damageSource = PlayerDeathReason.ByCustomReason(player.name + TranslationUtils.GetTranslation("JJDeath"));
+            }
+            return true;
+        }
 
         public override void UpdateBiomeVisuals()
         {
-
-            bool IsSolarFighter = false;
-
-            foreach (NPC npc in Main.npc)
+            if (MABBossChallenge.mabconfig.BossFightFilters)
             {
-                if (npc.active && npc.type == ModContent.NPCType<SolarFighterBoss>() && npc.ai[0] > 2)
+                bool IsSolarFighter = false;
+
+                foreach (NPC npc in Main.npc)
                 {
-                    IsSolarFighter = true;
+                    if (npc.active && npc.type == ModContent.NPCType<SolarFighterBoss>() && npc.ai[0] > 2)
+                    {
+                        IsSolarFighter = true;
+                    }
                 }
-            }
-            player.ManageSpecialBiomeVisuals("MABBossChallenge:SolarBossSky", IsSolarFighter, default);
-            player.ManageSpecialBiomeVisuals("Solar", IsSolarFighter || player.ZoneTowerSolar, new Vector2(Main.dungeonX, Main.dungeonY));
+                player.ManageSpecialBiomeVisuals("MABBossChallenge:SolarBossSky", IsSolarFighter, default);
+                player.ManageSpecialBiomeVisuals("Solar", IsSolarFighter || player.ZoneTowerSolar, new Vector2(Main.dungeonX, Main.dungeonY));
 
 
-            bool IsVortexRanger = false;
+                bool IsVortexRanger = false;
 
-            foreach (NPC npc in Main.npc)
-            {
-                if (npc.active && npc.type == ModContent.NPCType<VortexRangerBoss>() && npc.ai[0] > 2)
+                foreach (NPC npc in Main.npc)
                 {
-                    IsVortexRanger = true;
+                    if (npc.active && npc.type == ModContent.NPCType<VortexRangerBoss>() && npc.ai[0] > 2)
+                    {
+                        IsVortexRanger = true;
+                    }
                 }
-            }
 
-            player.ManageSpecialBiomeVisuals("MABBossChallenge:VortexBossSky", IsVortexRanger, default);
-            player.ManageSpecialBiomeVisuals("Vortex", IsVortexRanger || player.ZoneTowerVortex, new Vector2(Main.dungeonX, Main.dungeonY));
+                player.ManageSpecialBiomeVisuals("MABBossChallenge:VortexBossSky", IsVortexRanger, default);
+                player.ManageSpecialBiomeVisuals("Vortex", IsVortexRanger || player.ZoneTowerVortex, new Vector2(Main.dungeonX, Main.dungeonY));
 
-            bool IsNebulaMage = false;
+                bool IsNebulaMage = false;
 
-            foreach (NPC npc in Main.npc)
-            {
-                if (npc.active && npc.type == ModContent.NPCType<NebulaMageBoss>() && npc.ai[0] > 2)
+                foreach (NPC npc in Main.npc)
                 {
-                    IsNebulaMage = true;
+                    if (npc.active && npc.type == ModContent.NPCType<NebulaMageBoss>() && npc.ai[0] > 2)
+                    {
+                        IsNebulaMage = true;
+                    }
                 }
+
+
+                player.ManageSpecialBiomeVisuals("MABBossChallenge:NebulaBossSky", IsNebulaMage, default);
+                player.ManageSpecialBiomeVisuals("Nebula", IsNebulaMage || player.ZoneTowerNebula, new Vector2(Main.dungeonX, Main.dungeonY));
             }
-
-
-            player.ManageSpecialBiomeVisuals("MABBossChallenge:NebulaBossSky", IsNebulaMage, default);
-            player.ManageSpecialBiomeVisuals("Nebula", IsNebulaMage || player.ZoneTowerNebula, new Vector2(Main.dungeonX, Main.dungeonY));
-
         }
 
         public override void UpdateBiomes()
@@ -214,28 +272,6 @@ namespace MABBossChallenge
                 NPC.NewNPC((int)player.Center.X, (int)player.Center.Y, ModContent.NPCType<MeteorPlayerDefender>());
             }
 
-            bool IsSolarFighter = false;
-            foreach (NPC npc in Main.npc)
-            {
-                if (npc.active && npc.type == ModContent.NPCType<SolarFighterBoss>() && npc.ai[0] > 2)
-                {
-                    IsSolarFighter = true;
-                }
-            }
-
-            player.ManageSpecialBiomeVisuals("Solar", IsSolarFighter || player.ZoneTowerSolar, new Vector2(Main.dungeonX, Main.dungeonY));
-
-            bool IsVortexRanger = false;
-
-            foreach (NPC npc in Main.npc)
-            {
-                if (npc.active && npc.type == ModContent.NPCType<VortexRangerBoss>() && npc.ai[0] > 2)
-                {
-                    IsVortexRanger = true;
-                }
-            }
-
-            player.ManageSpecialBiomeVisuals("Vortex", IsVortexRanger || player.ZoneTowerVortex, new Vector2(Main.dungeonX, Main.dungeonY));
 
         }
 
@@ -263,8 +299,24 @@ namespace MABBossChallenge
 
 
 
-
-
+        public override void ModifyNursePrice(NPC nurse, int health, bool removeDebuffs, ref int price)
+        {
+            if (NPC.AnyNPCs(ModContent.NPCType<SolarFighterBoss>()) || NPC.AnyNPCs(ModContent.NPCType<VortexRangerBoss>()) ||
+    NPC.AnyNPCs(ModContent.NPCType<NebulaMageBoss>()) || NPC.AnyNPCs(ModContent.NPCType<StardustSummonerBoss>()))
+            {
+                price = 1145141919;
+            }
+        }
+        public override bool ModifyNurseHeal(NPC nurse, ref int health, ref bool removeDebuffs, ref string chatText)
+        {
+            if (NPC.AnyNPCs(ModContent.NPCType<SolarFighterBoss>()) || NPC.AnyNPCs(ModContent.NPCType<VortexRangerBoss>()) ||
+NPC.AnyNPCs(ModContent.NPCType<NebulaMageBoss>()) || NPC.AnyNPCs(ModContent.NPCType<StardustSummonerBoss>()))
+            {
+                removeDebuffs = false;
+                health = 1;
+            }
+            return true;
+        }
 
         public override void OnEnterWorld(Player player)
         {

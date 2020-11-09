@@ -20,6 +20,11 @@ namespace MABBossChallenge
         //[Tooltip("开启之后陨石守卫NPC会在战斗中使用BGM，默认为是")]
         public bool NPCAttackBGM;
 
+        [DefaultValue(true)]
+        [Label("Initialize filters when fighting bosses")]
+        //[Tooltip("Boss战是否打开滤镜")]
+        public bool BossFightFilters;
+
 
         public override ModConfig Clone()
         {
