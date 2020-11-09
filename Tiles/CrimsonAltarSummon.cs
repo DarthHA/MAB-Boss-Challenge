@@ -1,8 +1,10 @@
 ﻿using MABBossChallenge.Items;
 using MABBossChallenge.NPCs.MiniPlayerBoss;
+using MABBossChallenge.Utils;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
@@ -23,7 +25,8 @@ namespace MABBossChallenge.Tiles
             TileObjectData.addTile(Type);
 
             ModTranslation name = CreateMapEntryName();
-            name.SetDefault("奇怪的血腥祭坛");
+            name.SetDefault("Strange Crimson Altar");
+            name.AddTranslation(GameCulture.Chinese, "奇怪的血腥祭坛");
             AddMapEntry(new Color(144, 144, 144), name);
             adjTiles = new int[] { TileID.DemonAltar };
 
@@ -59,8 +62,8 @@ namespace MABBossChallenge.Tiles
                     int SummonY = j;
                     SummonX += (18 - Main.tile[i, j].frameX) / 18;
                     SummonY -= Main.tile[i, j].frameY / 18 + 1;
-                    NPC.NewNPC(SummonX * 16, SummonY * 16, ModContent.NPCType<CrimsonPlayerBoss>());
-                    Main.NewText("猩红守护者已苏醒！", 175, 75, 255);
+                    int npctmp = NPC.NewNPC(SummonX * 16, SummonY * 16, ModContent.NPCType<CrimsonPlayerBoss>());
+                    Main.NewText(Language.GetTextValue("Announcement.HasAwoken", Main.npc[npctmp].TypeName), 175, 75, byte.MaxValue, false);
                     Main.PlaySound(SoundID.Roar, Main.LocalPlayer.Center, 0);
                     return false;
                 }
@@ -76,8 +79,8 @@ namespace MABBossChallenge.Tiles
                     int SummonY = j;
                     SummonX += (18 - Main.tile[i, j].frameX) / 18;
                     SummonY -= Main.tile[i, j].frameY / 18 + 1;
-                    NPC.NewNPC(SummonX * 16, SummonY * 16, ModContent.NPCType<ShadowPlayerBoss>());
-                    Main.NewText("暗影守护者已苏醒！", 175, 75, 255);
+                    int npctmp = NPC.NewNPC(SummonX * 16, SummonY * 16, ModContent.NPCType<ShadowPlayerBoss>());
+                    Main.NewText(Language.GetTextValue("Announcement.HasAwoken", Main.npc[npctmp].TypeName), 175, 75, byte.MaxValue, false);
                     Main.PlaySound(SoundID.Roar, Main.LocalPlayer.Center, 0);
                     return false;
                 }
@@ -97,15 +100,16 @@ namespace MABBossChallenge.Tiles
                     Main.npc[npcmtp].damage = 90;
                     Main.npc[npcmtp].defense = 20;
                     Main.npc[npcmtp].localAI[2] = 1;
+                    Main.NewText(Language.GetTextValue("Announcement.HasAwoken", Main.npc[npcmtp].TypeName), 175, 75, byte.MaxValue, false);
                     npcmtp = NPC.NewNPC(SummonX * 16, SummonY * 16, ModContent.NPCType<CrimsonPlayerBoss>());
                     Main.npc[npcmtp].lifeMax = 48000;
                     Main.npc[npcmtp].life = 48000;
                     Main.npc[npcmtp].damage = 100;
                     Main.npc[npcmtp].defense = 40;
                     Main.npc[npcmtp].localAI[2] = 1;
-                    Main.NewText("守护者兄弟已苏醒！", 175, 75, 255);
-                    Main.LocalPlayer.GetModPlayer<SMPlayer>().Set(new Vector2(SummonX * 16, SummonY * 16), "守护者兄弟", "来自邪恶之地的二重奏");
+                    Main.NewText(Language.GetTextValue("Announcement.HasAwoken", Main.npc[npcmtp].TypeName), 175, 75, byte.MaxValue, false);
                     Main.PlaySound(SoundID.Roar, Main.LocalPlayer.Center, 0);
+                    Main.LocalPlayer.GetModPlayer<SMPlayer>().Set(new Vector2(SummonX * 16, SummonY * 16), TranslationUtils.GetTranslation("GuardianBro"), TranslationUtils.GetTranslation("GuardianBroDescription"));
                     return false;
                 }
             }

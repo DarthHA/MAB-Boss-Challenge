@@ -19,7 +19,7 @@ namespace MABBossChallenge.Tiles
             Main.tileBlockLight[Type] = true;
 
             ModTranslation name = CreateMapEntryName();
-            name.SetDefault("地形方块");
+            name.SetDefault("Arena");
             AddMapEntry(Color.DarkGray, name);
 
             dustType = 84;
