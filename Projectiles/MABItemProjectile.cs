@@ -1,4 +1,5 @@
 
+using MABBossChallenge.NPCs.PlayerBoss;
 using MABBossChallenge.Walls;
 using Microsoft.Xna.Framework;
 using System;
@@ -11,7 +12,7 @@ namespace MABBossChallenge
     public class MABItemProjectile : GlobalProjectile
     {
 
-       
+
 
 
         public override bool PreAI(Projectile projectile)
@@ -33,6 +34,17 @@ namespace MABBossChallenge
                     projectile.active = false;
                 }
             }
+
+
+            if (NPC.AnyNPCs(ModContent.NPCType<VortexRangerBoss>()) && projectile.type == ProjectileID.VortexVortexPortal)
+            {
+                projectile.active = false;
+            }
+            if (NPC.AnyNPCs(ModContent.NPCType<StardustSummonerBoss>()) && projectile.type == ProjectileID.StardustTowerMark)
+            {
+                projectile.active = false;
+            }
+
             return true;
         }
 
