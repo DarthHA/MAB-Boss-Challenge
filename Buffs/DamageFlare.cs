@@ -10,7 +10,7 @@ namespace MABBossChallenge.Buffs
         {
             DisplayName.SetDefault("Damage Flare");
             DisplayName.AddTranslation(GameCulture.Chinese, "伤害星云");
-            DisplayName.SetDefault("Your damage and crit desreased");
+            Description.SetDefault("Your damage and crit desreased");
             Description.AddTranslation(GameCulture.Chinese, "你的伤害和暴击降低了");
             Main.buffNoSave[Type] = false;
             Main.debuff[Type] = true;

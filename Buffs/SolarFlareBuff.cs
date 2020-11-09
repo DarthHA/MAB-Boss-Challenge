@@ -1,4 +1,6 @@
-﻿using Terraria;
+﻿using Terraria.ID;
+using MABBossChallenge.NPCs;
+using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
@@ -35,6 +37,12 @@ namespace MABBossChallenge.Buffs
         {
             if (player.GetModPlayer<MABPlayer>().SolarFlare < 4) { player.GetModPlayer<MABPlayer>().SolarFlare++; }
             return default;
+        }
+        public override void Update(NPC npc, ref int buffIndex)
+        {
+            npc.AddBuff(BuffID.Daybreak, npc.buffTime[buffIndex]);
+            npc.DelBuff(buffIndex);
+            buffIndex--;
         }
 
     }

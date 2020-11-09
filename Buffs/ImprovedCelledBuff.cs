@@ -10,7 +10,7 @@ namespace MABBossChallenge.Buffs
         {
             DisplayName.SetDefault("Cell Parasitism");
             DisplayName.AddTranslation(GameCulture.Chinese, "细胞寄生");
-            DisplayName.SetDefault("Cells block the way to heal");
+            Description.SetDefault("Cells block the way to heal");
             Description.AddTranslation(GameCulture.Chinese, "细胞阻碍你进行治疗");
             Main.buffNoSave[Type] = false;
             Main.debuff[Type] = true;
