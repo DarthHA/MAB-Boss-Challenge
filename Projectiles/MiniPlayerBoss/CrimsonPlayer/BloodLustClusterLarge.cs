@@ -167,7 +167,11 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.CrimsonPlayer
         }
         public override bool? CanHitNPC(NPC target)
         {
-            return projectile.alpha == 0;
+            if (projectile.alpha == 0)
+            {
+                return null;
+            }
+            return false;
         }
         public override void OnHitPlayer(Player target, int damage, bool crit)
         {

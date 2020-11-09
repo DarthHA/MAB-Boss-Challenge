@@ -22,6 +22,7 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.CrimsonPlayer
             projectile.aiStyle = -1;
             projectile.hide = true;
             projectile.hostile = true;
+            projectile.friendly = false;
             projectile.timeLeft = 120;
         }
 
