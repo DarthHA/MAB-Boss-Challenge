@@ -1,4 +1,5 @@
 ﻿using MABBossChallenge.NPCs.PlayerBoss;
+using MABBossChallenge.Utils;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
@@ -13,9 +14,10 @@ namespace MABBossChallenge.Items
         {
             DisplayName.SetDefault("Celestial Rune MK2 EX");
             DisplayName.AddTranslation(GameCulture.Chinese, "天界符文MK2 EX");
-            Tooltip.SetDefault("Summon the four awakened defenders at the same time\nAlthough by now there are only two lol\nNot consumed");
-            Tooltip.AddTranslation(GameCulture.Chinese, "直接召唤觉醒的月下四柱男\n尽管目前只有两个（笑）\n该物品不消耗");
+            Tooltip.SetDefault("Summon the four awakened defenders at the same time\nAlthough by now there are only three lol\nNot consumed");
+            Tooltip.AddTranslation(GameCulture.Chinese, "直接召唤觉醒的月下四柱男\n尽管目前只有三个（笑）\n该物品不消耗");
             ItemID.Sets.SortingPriorityBossSpawns[item.type] = 13;
+            TranslationUtils.AddTranslation("AwakenedDefendersSpawn", "Awakened defenders have awoken.","觉醒守护者们已苏醒");
         }
 
         public override void SetDefaults()
@@ -50,9 +52,10 @@ namespace MABBossChallenge.Items
             if (player.itemAnimation > 0 && player.itemTime == 0)
             {
                 Main.PlaySound(SoundID.Roar, player.Center, 0);
-                Main.NewText("觉醒守护者们已苏醒！", 175, 75, 255);
-                NPC.NewNPC((int)player.Center.X + 200, (int)player.Center.Y - 200, ModContent.NPCType<SolarFighterBoss>(), default, 4, default, default, default, default);
-                NPC.NewNPC((int)player.Center.X - 200, (int)player.Center.Y - 200, ModContent.NPCType<VortexRangerBoss>(), default, 4, default, default, default, default);
+                Main.NewText(TranslationUtils.GetTranslation("AwakenedDefendersSpawn"), 175, 75, 255);
+                NPC.NewNPC((int)player.Center.X, (int)player.Center.Y - 400, ModContent.NPCType<SolarFighterBoss>(), default, 4, default, default, default, default);
+                NPC.NewNPC((int)player.Center.X - 400, (int)player.Center.Y, ModContent.NPCType<VortexRangerBoss>(), default, 4, default, default, default, default);
+                NPC.NewNPC((int)player.Center.X + 400, (int)player.Center.Y, ModContent.NPCType<NebulaMageBoss>(), default, 4, default, default, default, default);
             }
             return true;
         }

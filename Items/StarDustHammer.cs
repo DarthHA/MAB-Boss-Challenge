@@ -97,16 +97,5 @@ namespace MABBossChallenge.Items
             }
             return true;
         }
-        public override void AddRecipes()
-        {
-            ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(ItemID.FragmentStardust, 20);
-            recipe.AddIngredient(ItemID.LunarBar, 20);
-            recipe.AddTile(TileID.LunarCraftingStation);
-
-            recipe.SetResult(this);
-
-            recipe.AddRecipe();
-        }
     }
 }

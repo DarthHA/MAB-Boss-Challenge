@@ -116,7 +116,6 @@ namespace MABBossChallenge.Items
                     return false;
                 }
             }
-            Main.NewText("陨石已落地！", Color.Orange);
             return true;
         }
 

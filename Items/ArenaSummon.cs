@@ -1,4 +1,5 @@
 ﻿using MABBossChallenge.Tiles;
+using MABBossChallenge.Utils;
 using MABBossChallenge.Walls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,6 +19,9 @@ namespace MABBossChallenge.Items
             DisplayName.SetDefault("战场生成器");
             Tooltip.SetDefault("Generate a battlefield in the evils");
             Tooltip.AddTranslation(GameCulture.Chinese,"在世界的邪恶地形处生成一座战场！");
+            TranslationUtils.AddTranslation("BattlefieldOccupied", "There is a battlefield already in this world!", "该世界已经有一个战场了！");
+            TranslationUtils.AddTranslation("BattlefieldFailed", "Generation failed, this world may not have a suitable evil!", "生成失败！，该世界可能缺少适合的邪恶地形！");
+            TranslationUtils.AddTranslation("BattlefieldSucceed", "Battlefield generated successfully!", "已成功生成战场！");
         }
 
         public override void SetDefaults()
@@ -40,7 +44,7 @@ namespace MABBossChallenge.Items
             {
                 if (MABWorld.IsCreated)
                 {
-                    Main.NewText("该世界已经有一个战场了！", Color.Green);
+                    Main.NewText(TranslationUtils.GetTranslation("BattlefieldOccupied"), Color.Green);
                     return false;
                 }
                 else
@@ -86,7 +90,7 @@ namespace MABBossChallenge.Items
                 t++;
                 if (t > 5000 && !flag)
                 {
-                    Main.NewText("生成失败！，该世界可能缺少适合的邪恶地形！", Color.Red);
+                    Main.NewText(TranslationUtils.GetTranslation("BattlefieldFailed"), Color.Red);
                     return;
                 }
             }
@@ -144,7 +148,7 @@ namespace MABBossChallenge.Items
                     WorldGen.PlaceTile(x + _x, y + _y, WorldGen.crimson ? ModContent.TileType<CrimsonAltarSummon>() : ModContent.TileType<DemonAltarSummon>(), false, true);
                 }
             }
-            Main.NewText("已成功生成战场！", Color.Green);
+            Main.NewText(TranslationUtils.GetTranslation("BattlefieldSucceed"), Color.Green);
             MABWorld.IsCreated = true;
         }
 
