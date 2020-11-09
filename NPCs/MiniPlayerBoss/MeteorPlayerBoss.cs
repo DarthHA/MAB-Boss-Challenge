@@ -523,7 +523,7 @@ namespace MABBossChallenge.NPCs.MiniPlayerBoss
             Tex = MABBossChallenge.Instance.GetTexture("NPCs/MiniPlayerBoss/MeteorPlayerBoss_Head");
             spritebatch.Draw(Tex, Pos, Frame, a, 0, Frame.Size() / 2, 1, SP, 0);
 
-            if (npc.ai[1] == 7 && npc.ai[2] > 150 && Main.hardMode)
+            if (npc.ai[1] == 7 && npc.ai[2] > 150 && Main.hardMode && MABWorld.DownedMeteorPlayer)
             {
                 Tex = Main.itemTexture[ItemID.MeteorStaff];
                 Vector2 Facing = Main.player[npc.target].Center - npc.Center;

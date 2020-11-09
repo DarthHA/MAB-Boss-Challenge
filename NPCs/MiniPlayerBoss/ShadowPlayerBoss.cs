@@ -59,7 +59,7 @@ namespace MABBossChallenge.NPCs.MiniPlayerBoss
         {
             npc.TargetClosest();
             bool Raged = npc.localAI[2] == 1 && NPC.AnyNPCs(ModContent.NPCType<CrimsonPlayerBoss>());
-            if (SpawnPos == Vector2.Zero)
+            if (SpawnPos == Vector2.Zero && npc.collideY)
             {
                 SpawnPos = npc.Center;
             }
@@ -79,7 +79,7 @@ namespace MABBossChallenge.NPCs.MiniPlayerBoss
 
                 if (npc.Center.X > SpawnPos.X + 795 || npc.Center.X < SpawnPos.X - 795) 
                 {
-                    npc.velocity = Vector2.Zero;
+                    npc.velocity.X = 0;
                 }
             }
             npc.spriteDirection = npc.direction = Math.Sign(player.Center.X - npc.Center.X);
@@ -638,7 +638,7 @@ namespace MABBossChallenge.NPCs.MiniPlayerBoss
             }
             MABWorld.DownedPreEvilFighter = true;
             int protmp = Projectile.NewProjectile(npc.Center, (Main.rand.NextFloat() * MathHelper.TwoPi).ToRotationVector2() * 5, ProjectileID.Tombstone, 0, 0, Main.myPlayer);
-            Main.projectile[protmp].miscText = "暗影守护者 被击败了，凶手是" + Main.LocalPlayer.name + "。";
+            //Main.projectile[protmp].miscText = "暗影守护者 被击败了，凶手是" + Main.LocalPlayer.name + "。";
         }
         private void DP(SpriteBatch spritebatch,Vector2 Pos,Color a)
         {
