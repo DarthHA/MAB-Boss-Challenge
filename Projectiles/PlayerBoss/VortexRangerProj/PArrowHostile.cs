@@ -27,7 +27,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
         }
         public override void AI()
         {
-            Player target = Main.player[projectile.owner];
+            Player target = Main.player[Player.FindClosest(projectile.Center, 1, 1)];
             projectile.tileCollide = Collision.CanHitLine(projectile.position, projectile.width, projectile.height, target.position, target.width, target.height);
 
             projectile.rotation = projectile.velocity.ToRotation() - MathHelper.Pi / 2;
@@ -57,6 +57,11 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.White;
+        }
+
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
         }
 
     }

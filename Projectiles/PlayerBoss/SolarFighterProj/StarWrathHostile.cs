@@ -47,7 +47,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
                 {
                     float r = Main.rand.NextFloat() * MathHelper.Pi;
                     //int protmp = Projectile.NewProjectile(new Vector2(owner.Center.X, Main.screenPosition.Y - 50), new Vector2(Main.rand.Next(5) - 2, 10), ProjectileID.StarWrath, projectile.damage, 0,target.whoAmI);
-                    int protmp = Projectile.NewProjectile(target.Center + target.velocity + r.ToRotationVector2() * -1000, r.ToRotationVector2() * 13, ProjectileID.StarWrath, projectile.damage, 0, owner.target);
+                    int protmp = Projectile.NewProjectile(target.Center + target.velocity / 3 + r.ToRotationVector2() * -1000, r.ToRotationVector2() * 13, ProjectileID.StarWrath, projectile.damage, 0, owner.target);
                     Main.projectile[protmp].hostile = true;
                     Main.projectile[protmp].friendly = false;
                     Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
@@ -78,6 +78,11 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
         {
             target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
             target.AddBuff(BuffID.OnFire, 300);
+        }
+
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
         }
     }
 }

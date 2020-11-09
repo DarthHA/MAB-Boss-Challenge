@@ -27,12 +27,21 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
             projectile.damage = 10;
             projectile.penetrate = -1;
             projectile.netImportant = true;
+            projectile.tileCollide = false;
         }
         public override void AI()
         {
-            if (projectile.ai[0] > 200 || projectile.ai[0] < 0) projectile.Kill();
+            if (projectile.ai[0] > 200 || projectile.ai[0] < 0)
+            {
+                projectile.Kill();
+                return;
+            }
             NPC owner = Main.npc[(int)projectile.ai[0]];
-            if (!owner.active || owner.type != ModContent.NPCType<VortexRangerBoss>()) projectile.Kill();
+            if (!owner.active || owner.type != ModContent.NPCType<VortexRangerBoss>())
+            {
+                projectile.Kill();
+                return;
+            }
             Player target = Main.player[owner.target];
             projectile.alpha = owner.alpha;
             projectile.spriteDirection = owner.spriteDirection;

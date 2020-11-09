@@ -74,6 +74,19 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
             Main.projectile[protmp].Kill();
         }
 
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+
+            target.AddBuff(BuffID.Burning, 300);
+            target.AddBuff(BuffID.Dazed, 60);
+            if (Main.npc[(int)projectile.ai[0]].ai[0] > 1) target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            int protmp = Projectile.NewProjectile(target.Center, Vector2.Zero, ProjectileID.SolarCounter, projectile.damage, 0, Main.myPlayer);
+            Main.projectile[protmp].hostile = true;
+            Main.projectile[protmp].friendly = false;
+            Main.projectile[protmp].Kill();
+        }
+    
+
         public override void Kill(int timeLeft)
         {
             for (int num15 = 0; num15 < 16; num15++)
@@ -85,6 +98,11 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
                 dust.velocity *= 5f;
                 //dust.shader = GameShaders.Armor.GetSecondaryShader(Main.LocalPlayer.ArmorSetDye(), Main.LocalPlayer);
             }
+        }
+
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
         }
     }
 }

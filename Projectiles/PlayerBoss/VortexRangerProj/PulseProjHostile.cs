@@ -57,7 +57,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
             projectile.ai[1]++;
             if (projectile.ai[1] % 150 == 149)
             {
-                Player target = Main.player[projectile.owner];
+                Player target = Main.player[Player.FindClosest(projectile.Center, 1, 1)];
                 Vector2 ShootVel = Vector2.Normalize(target.Center - projectile.Center);
                 projectile.velocity = ShootVel * projectile.velocity.Length();
                 projectile.penetrate -= 1;
@@ -65,6 +65,9 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
             }
         }
 
-
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
+        }
     }
 }

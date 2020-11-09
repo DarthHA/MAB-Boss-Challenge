@@ -32,9 +32,17 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
         }
         public override void AI()
         {
-            if (projectile.ai[0] > 200 || projectile.ai[0] < 0) projectile.Kill();
+            if (projectile.ai[0] > 200 || projectile.ai[0] < 0)
+            {
+                projectile.Kill();
+                return;
+            }
             NPC owner = Main.npc[(int)projectile.ai[0]];
-            if (!owner.active || owner.type != ModContent.NPCType<VortexRangerBoss>()) projectile.Kill();
+            if (!owner.active || owner.type != ModContent.NPCType<VortexRangerBoss>())
+            {
+                projectile.Kill();
+                return;
+            }
             projectile.alpha = owner.alpha;
             Player target = Main.player[owner.target];
             Vector2 Facing = Vector2.Normalize(target.Center - owner.Center);

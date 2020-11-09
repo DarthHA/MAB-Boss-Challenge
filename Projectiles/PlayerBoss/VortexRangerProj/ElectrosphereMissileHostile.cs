@@ -28,7 +28,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
 
         public override void AI()
         {
-            Player target = Main.player[projectile.owner];
+            Player target = Main.player[Player.FindClosest(projectile.Center, 1, 1)];
             projectile.tileCollide = Collision.CanHitLine(projectile.position, projectile.width, projectile.height, target.position, target.width, target.height);
             projectile.rotation = (float)Math.Atan2(projectile.velocity.Y, projectile.velocity.X) + MathHelper.Pi / 2;
             if (projectile.ai[0] > 1000 || projectile.ai[0] < 0) projectile.Kill();
@@ -84,6 +84,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
 
             spriteBatch.Draw(Tex1, projectile.Center - Main.screenPosition + new Vector2(0, projectile.gfxOffY), null, Color.White, projectile.rotation, Tex1.Size() * 0.5f, 1.0f, SpriteEffects.None, 0);
             return false;
+        }
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
         }
     }
 }

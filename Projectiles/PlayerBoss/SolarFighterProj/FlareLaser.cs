@@ -96,6 +96,11 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
             target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
             target.AddBuff(BuffID.OnFire, 300);
         }
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            target.AddBuff(BuffID.Burning, 300);
+        }
         public override bool CanDamage()
         {
             return projectile.ai[1] >= 20;
@@ -105,6 +110,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
             DelegateMethods.v3_1 = new Vector3(0.8f, 0.8f, 1f);
             Vector2 unit = Vector2.Normalize(projectile.velocity);
             Terraria.Utils.PlotTileLine(projectile.Center - unit * 1000, projectile.Center + unit * 1000, 10, DelegateMethods.CastLight);
+        }
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
         }
     }
 }

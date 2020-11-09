@@ -48,10 +48,11 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
                 if (projectile.localAI[1] % 3 == 2)
                 {
                     Vector2 Vel = Vector2.Normalize(projectile.Center - owner.Center);
-                    int protmp = Projectile.NewProjectile(projectile.Center, Vel * 15, ProjectileID.DD2FlameBurstTowerT3Shot, projectile.damage, 0, Main.player[owner.target].whoAmI);
+                    int protmp = Projectile.NewProjectile(projectile.Center, Vel * 15, ProjectileID.DD2FlameBurstTowerT3Shot, projectile.damage, 0);
                     Main.projectile[protmp].hostile = true;
                     Main.projectile[protmp].friendly = false;
                     Main.projectile[protmp].scale = 2.0f;
+                    Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
                 }
             }
 
@@ -64,7 +65,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
 
                     Main.PlaySound(SoundID.Item, projectile.Center, 14);
 
-                    int protmp = Projectile.NewProjectile(projectile.Center, Vector2.Zero, ProjectileID.DD2ExplosiveTrapT3Explosion, projectile.damage, 4, Main.myPlayer);
+                    int protmp = Projectile.NewProjectile(projectile.Center, Vector2.Zero, ProjectileID.DD2ExplosiveTrapT3Explosion, projectile.damage, 0);
                     Main.projectile[protmp].hostile = true;
                     Main.projectile[protmp].friendly = false;
                     Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
@@ -72,21 +73,21 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
                     for (float i = 0; i <= MathHelper.TwoPi; i += MathHelper.Pi / 16)
                     {
                         float r = (float)Math.Atan2(projectile.velocity.Y, projectile.velocity.X);
-                        int protmp1 = Projectile.NewProjectile(projectile.Center, (i + r).ToRotationVector2() * 15, ProjectileID.DD2FlameBurstTowerT3Shot, projectile.damage, 0, Main.player[owner.target].whoAmI);
+                        int protmp1 = Projectile.NewProjectile(projectile.Center, (i + r).ToRotationVector2() * 15, ProjectileID.DD2FlameBurstTowerT3Shot, projectile.damage, 0);
                         Main.projectile[protmp1].hostile = true;
                         Main.projectile[protmp1].friendly = false;
                         Main.projectile[protmp1].scale = 2.0f;
                         Main.projectile[protmp].tileCollide = false;
                         Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
 
-                        protmp1 = Projectile.NewProjectile(projectile.Center, (i + r + MathHelper.Pi / 32).ToRotationVector2() * 10, ProjectileID.DD2FlameBurstTowerT3Shot, projectile.damage, 0, Main.player[owner.target].whoAmI);
+                        protmp1 = Projectile.NewProjectile(projectile.Center, (i + r + MathHelper.Pi / 32).ToRotationVector2() * 10, ProjectileID.DD2FlameBurstTowerT3Shot, projectile.damage, 0);
                         Main.projectile[protmp1].hostile = true;
                         Main.projectile[protmp1].friendly = false;
                         Main.projectile[protmp1].scale = 2.0f;
                         Main.projectile[protmp].tileCollide = false;
                         Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
 
-                        protmp1 = Projectile.NewProjectile(projectile.Center, (i + r).ToRotationVector2() * 5, ProjectileID.DD2FlameBurstTowerT3Shot, projectile.damage, 0, Main.player[owner.target].whoAmI);
+                        protmp1 = Projectile.NewProjectile(projectile.Center, (i + r).ToRotationVector2() * 5, ProjectileID.DD2FlameBurstTowerT3Shot, projectile.damage, 0);
                         Main.projectile[protmp1].hostile = true;
                         Main.projectile[protmp1].friendly = false;
                         Main.projectile[protmp1].scale = 2.0f;
@@ -149,8 +150,20 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
             target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
             target.AddBuff(BuffID.OnFire, 300);
         }
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            target.AddBuff(BuffID.Burning, 300);
+        }
         public override void ModifyHitPlayer(Player target, ref int damage, ref bool crit)
         {
+            if (projectile.ai[1] == 1)
+                damage = (int)(damage * 1.5f);
+        }
+
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
             if (projectile.ai[1] == 1)
                 damage = (int)(damage * 1.5f);
         }

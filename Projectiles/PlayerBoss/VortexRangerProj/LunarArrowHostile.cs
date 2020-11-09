@@ -107,5 +107,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
             spriteBatch.Draw(Tex1, projectile.Center - Main.screenPosition + new Vector2(0, projectile.gfxOffY), null, Color.White, projectile.rotation, Tex1.Size() * 0.5f, 1.0f, SpriteEffects.None, 0);
             return false;
         }
+
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
+        }
     }
 }

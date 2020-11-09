@@ -1,7 +1,8 @@
-using MABBossChallenge.NPCs.PlayerBoss;
+ï»¿using MABBossChallenge.NPCs.PlayerBoss;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
@@ -10,7 +11,8 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("³¡µØÐ£×¼µã");
+            DisplayName.SetDefault("Arena Calibration Point");
+            DisplayName.AddTranslation(GameCulture.Chinese, "åœºåœ°æ ¡å‡†ç‚¹");
         }
         public override void SetDefaults()
         {
@@ -24,6 +26,11 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
         }
         public override void AI()
         {
+            if (projectile.ai[0] > 200 || projectile.ai[0] < 0)
+            {
+                projectile.Kill();
+                return;
+            }
             NPC owner = Main.npc[(int)projectile.ai[0]];
             if ((!owner.active || owner.type != ModContent.NPCType<VortexRangerBoss>()) && projectile.ai[1] > 0) projectile.ai[1] = -41;
             if (owner.localAI[3] == 1)

@@ -32,6 +32,9 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
             Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
         }
 
-
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
+        }
     }
 }

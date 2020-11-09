@@ -27,7 +27,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
         }
         public override void AI()
         {
-            Player target = Main.player[projectile.owner];
+            Player target = Main.player[Player.FindClosest(projectile.Center, 1, 1)];
             projectile.tileCollide = Collision.CanHitLine(projectile.position, projectile.width, projectile.height, target.position, target.width, target.height);
 
             if (Main.rand.Next(2) == 0)
@@ -65,24 +65,25 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
                 num3 = num481;
             }
 
-
-            float x = projectile.position.X + Main.rand.Next(-400, 400);
-            float y = projectile.position.Y - Main.rand.Next(1800, 2400);
-            Vector2 vector21 = new Vector2(x, y);
-            float num484 = projectile.Center.X - vector21.X;
-            float num485 = projectile.Center.Y - vector21.Y;
-            float num487 = (float)Math.Sqrt(num484 * num484 + num485 * num485);
-            num487 = 22 / num487;
-            num484 *= num487;
-            num485 *= num487;
-            int num489 = Projectile.NewProjectile(x, y, num484, num485, ProjectileID.HallowStar, projectile.damage, projectile.knockBack, projectile.owner, 0f, 0f);
-            Main.projectile[num489].ai[1] = projectile.position.Y;
-            Main.projectile[num489].ai[0] = 1f;
-            Main.projectile[num489].friendly = false;
-            Main.projectile[num489].tileCollide = false;
-            Main.projectile[num489].hostile = true;
-            Main.projectile[num489].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
-
+            if (Main.rand.Next(3) >= 1)
+            {
+                float x = projectile.position.X + Main.rand.Next(-400, 400);
+                float y = projectile.position.Y - Main.rand.Next(1800, 2400);
+                Vector2 vector21 = new Vector2(x, y);
+                float num484 = projectile.Center.X - vector21.X;
+                float num485 = projectile.Center.Y - vector21.Y;
+                float num487 = (float)Math.Sqrt(num484 * num484 + num485 * num485);
+                num487 = 22 / num487;
+                num484 *= num487;
+                num485 *= num487;
+                int num489 = Projectile.NewProjectile(x, y, num484, num485, ProjectileID.HallowStar, projectile.damage, projectile.knockBack, projectile.owner, 0f, 0f);
+                Main.projectile[num489].ai[1] = projectile.position.Y;
+                Main.projectile[num489].ai[0] = 1f;
+                Main.projectile[num489].friendly = false;
+                Main.projectile[num489].tileCollide = false;
+                Main.projectile[num489].hostile = true;
+                Main.projectile[num489].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
+            }
         }
 
 
@@ -102,6 +103,11 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
 
             spriteBatch.Draw(Tex1, projectile.Center - Main.screenPosition + new Vector2(0, projectile.gfxOffY), null, Color.White, projectile.rotation, Tex1.Size() * 0.5f, 1.0f, SpriteEffects.None, 0);
             return false;
+        }
+
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            damage *= 10;
         }
     }
 }

@@ -32,9 +32,17 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
         }
         public override void AI()
         {
-            if (projectile.ai[0] > 200 || projectile.ai[0] < 0) projectile.Kill();
+            if (projectile.ai[0] > 200 || projectile.ai[0] < 0)
+            {
+                projectile.Kill();
+                return;
+            }
             NPC owner = Main.npc[(int)projectile.ai[0]];
-            if (!owner.active || owner.type != ModContent.NPCType<VortexRangerBoss>()) projectile.Kill();
+            if (!owner.active || owner.type != ModContent.NPCType<VortexRangerBoss>())
+            {
+                projectile.Kill();
+                return;
+            }
             projectile.alpha = owner.alpha;
             Player target = Main.player[owner.target];
             projectile.spriteDirection = owner.spriteDirection;
@@ -63,13 +71,13 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
 
                 for (int i = 0; i < 3; i++)
                 {
-                    protmp = Projectile.NewProjectile(projectile.Center, (FacingR + MathHelper.Pi / 8 * Main.rand.NextFloat() - MathHelper.Pi / 16).ToRotationVector2() * 15, ProjectileID.IchorBullet, (int)(projectile.damage * 0.9), 0, default);
+                    protmp = Projectile.NewProjectile(projectile.Center, (FacingR + MathHelper.Pi / 9 * Main.rand.NextFloat() - MathHelper.Pi / 18).ToRotationVector2() * 15, ProjectileID.IchorBullet, (int)(projectile.damage * 0.9), 0, default);
                     Main.projectile[protmp].hostile = true;
                     Main.projectile[protmp].friendly = false; ;
                     Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
                     Main.projectile[protmp].tileCollide = false;
                     Main.projectile[protmp].scale = 2;
-                    protmp = Projectile.NewProjectile(projectile.Center, (FacingR + MathHelper.Pi / 7 * Main.rand.NextFloat() - MathHelper.Pi / 14).ToRotationVector2() * 15, ProjectileID.CursedBullet, (int)(projectile.damage * 0.9), 0, default);
+                    protmp = Projectile.NewProjectile(projectile.Center, (FacingR + MathHelper.Pi / 8 * Main.rand.NextFloat() - MathHelper.Pi / 16).ToRotationVector2() * 15, ProjectileID.CursedBullet, (int)(projectile.damage * 0.9), 0, default);
                     Main.projectile[protmp].hostile = true;
                     Main.projectile[protmp].friendly = false; ;
                     Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
@@ -96,5 +104,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
             }
             return false;
         }
+
+
     }
 }

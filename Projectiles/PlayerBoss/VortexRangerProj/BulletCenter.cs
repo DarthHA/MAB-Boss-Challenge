@@ -1,3 +1,4 @@
+﻿using Terraria.Localization;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -9,7 +10,8 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("��ĻУ׼��");
+            DisplayName.SetDefault("Proj Calibration Point");
+            DisplayName.AddTranslation(GameCulture.Chinese, "弹幕校准点");
         }
         public override void SetDefaults()
         {
