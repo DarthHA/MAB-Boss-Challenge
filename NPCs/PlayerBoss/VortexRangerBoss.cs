@@ -1,8 +1,10 @@
-﻿using MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj;
+﻿using MABBossChallenge.Buffs;
+using MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj;
 using MABBossChallenge.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
@@ -30,8 +32,13 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             npc.width = 38;
             npc.height = 50;
             npc.damage = 100;
-            npc.defense = 40;
-            npc.lifeMax = 50000;
+            npc.defense = 20;
+            npc.lifeMax = 40000;
+            if (!Main.expertMode)
+            {
+                npc.damage = 60;
+                npc.lifeMax = 30000;
+            }
             npc.HitSound = SoundID.NPCHit4;
             npc.DeathSound = SoundID.NPCHit4;
             npc.noGravity = true;
@@ -41,6 +48,12 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             npc.aiStyle = -1;
             npc.netAlways = true;
             npc.buffImmune[BuffID.OnFire] = true;
+            npc.buffImmune[ModContent.BuffType<SolarFlareBuff>()] = true;
+            npc.buffImmune[ModContent.BuffType<JusticeJudegmentBuff>()] = true;
+            npc.buffImmune[ModContent.BuffType<ManaFlare>()] = true;
+            npc.buffImmune[ModContent.BuffType<LifeFlare>()] = true;
+            npc.buffImmune[ModContent.BuffType<DamageFlare>()] = true;
+            npc.buffImmune[ModContent.BuffType<ImprovedCelledBuff>()] = true;
             music = mod.GetSoundSlot(SoundType.Music, "Sounds/Music/Heroic");
             musicPriority = MusicPriority.BossHigh;
             //NPCID.Sets.TrailCacheLength[npc.type] = 6;
@@ -179,6 +192,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
 
             if (npc.ai[0] == 0)               //开局
             {
+                npc.GivenName = TranslationUtils.GetTranslation("VortexDefender");
                 if (!MABWorld.DownedVortexPlayer)
                 {
                     npc.ai[2]++;
@@ -290,10 +304,16 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                 npc.ai[2]++;
                 if (npc.ai[2] == 1)
                 {
-                    music = mod.GetSoundSlot(SoundType.Music, "Sounds/Music/The Last Guardian");
+                    music = mod.GetSoundSlot(SoundType.Music, "Sounds/Music/Ex Mechina");
                     npc.lifeMax = 300000;
-                    npc.damage = 200;
-                    npc.defense = 60;
+                    npc.damage = 180;
+                    npc.defense = 40;
+                    if (!Main.expertMode)
+                    {
+                        npc.damage = 120;
+                        npc.lifeMax = 200000;
+                        npc.defense = 20;
+                    }
                     Projectile.NewProjectile(npc.Center, Vector2.Zero, ModContent.ProjectileType<VortexRitual>(), 0, 0, default, npc.whoAmI);
                 }
                 if (npc.ai[2] == 120)
@@ -307,9 +327,9 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                 }
                 if (npc.ai[2] >= 120 && npc.ai[2] <= 240)
                 {
-                    npc.HealEffect(500);
                     if (npc.life < npc.lifeMax - 500)
                     {
+                        npc.HealEffect(500);
                         npc.life += 500;
                     }
                     else
@@ -416,6 +436,13 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                             {
                                 npc.ai[2] = 0;
                                 npc.ai[1] = (Main.rand.NextBool()) ? 6 : 8;
+                                foreach(Projectile proj in Main.projectile)
+                                {
+                                    if (proj.active && (proj.type == ProjectileID.HallowStar || proj.type == ModContent.ProjectileType<HolyArrowHostile>()) && proj.hostile) 
+                                    {
+                                        proj.Kill();
+                                    }
+                                }
                             }
                         }
                         break;
@@ -500,6 +527,13 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                                 npc.ai[2] = 0;
                                 if (Main.rand.NextBool()) npc.ai[3] = 1;              //隐形
                                 npc.localAI[3] = 1;              //去场地
+                                foreach (Projectile proj in Main.projectile)
+                                {
+                                    if (proj.active && proj.type == ProjectileID.GreekFire2)
+                                    {
+                                        proj.Kill();
+                                    }
+                                }
                             }
                         }
                         break;
@@ -608,13 +642,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             return false;
         }
 
-        /*
-        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
-        {
-            if (npc.alpha == 255) return false;
-            return base.DrawHealthBar(hbPosition, ref scale, ref position);
-        }
-        */
+
         public override void BossHeadSpriteEffects(ref SpriteEffects spriteEffects)
         {
             spriteEffects = (npc.spriteDirection > 0) ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
@@ -629,7 +657,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
         public override void ModifyHitByProjectile(Projectile projectile, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
             damage /= 3 / 2;
-            if (npc.ai[0] == 3) damage /= 2;
+            if (npc.ai[0] == 3) damage /= 3 / 2;
         }
 
         public override void NPCLoot()
@@ -637,6 +665,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             if (!MABWorld.DownedVortexPlayer)
             {
                 NPC.ShieldStrengthTowerVortex = 1;
+                Projectile.NewProjectile(npc.Center, Vector2.Zero, ProjectileID.TowerDamageBolt, 0, 0f, Main.myPlayer, NPC.FindFirstNPC(NPCID.LunarTowerVortex), 0f);
             }
             MABWorld.DownedVortexPlayer = true;
             int protmp = Projectile.NewProjectile(npc.Center, (Main.rand.NextFloat() * MathHelper.TwoPi).ToRotationVector2() * 5, ProjectileID.Tombstone, 0, 0, Main.myPlayer);
@@ -663,45 +692,37 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             if (npc.ai[0] == 3)
             {
                 MABWorld.DownedVortexPlayerEX = true;
-                int LootNum = Main.rand.Next(10) + 30;
+                int LootNum = 114 + Main.rand.Next(514);
                 for (int i = 0; i < LootNum; i++)
                 {
                     Item.NewItem(npc.Hitbox, ItemID.FragmentVortex);
                 }
-                switch (Main.rand.Next(5))
-                {
-                    case 0:
-                        Item.NewItem(npc.Hitbox, ItemID.VortexBeater);
-                        break;
-                    case 1:
-                        Item.NewItem(npc.Hitbox, ItemID.Phantasm);
-                        break;
-                    case 2:
-                        Item.NewItem(npc.Hitbox, ItemID.FireworksLauncher);
-                        break;
-                    case 3:
-                        Item.NewItem(npc.Hitbox, ItemID.SDMG);
-                        break;
-                    case 4:
-                        Item.NewItem(npc.Hitbox, ItemID.MoonlordBullet, 999);
-                        break;
-                    default:
-                        break;
-                }
 
-                switch (Main.rand.Next(3))
-                {
-                    case 0:
-                        Item.NewItem(npc.Hitbox, ItemID.VortexBreastplate);
-                        break;
-                    case 1:
-                        Item.NewItem(npc.Hitbox, ItemID.VortexHelmet);
-                        break;
-                    case 2:
-                        Item.NewItem(npc.Hitbox, ItemID.VortexLeggings);
-                        break;
-                }
 
+                List<int> list1 = new List<int>();
+                list1.Add(ItemID.VortexBreastplate);
+                list1.Add(ItemID.VortexHelmet);
+                list1.Add(ItemID.VortexLeggings);
+                list1.Add(ItemID.Phantasm);
+                list1.Add(ItemID.VortexBeater);
+                list1.Add(ItemID.SDMG);
+                list1.Add(ItemID.FireworksLauncher);
+                for (int i = 0; i < 4; i++)
+                {
+                    int type = list1[Main.rand.Next(list1.Count)];
+                    list1.Remove(type);
+                    Item.NewItem(npc.Hitbox, type);
+                }
+                int r = Main.rand.Next(4);
+                if (r == 1)
+                {
+                    Item.NewItem(npc.Hitbox, ItemID.MoonlordBullet, 999);
+                }
+                if (r == 2)
+                {
+                    Item.NewItem(npc.Hitbox, ItemID.MoonlordArrow, 999);
+                }
+                
             }
 
         }
@@ -719,6 +740,10 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                 npc.localAI[1] = 0;
                 npc.localAI[2] = 0;
                 npc.localAI[3] = 0;
+                for (int i = 0; i < 15; i++)
+                {
+                    Item.NewItem(npc.Hitbox, ItemID.Heart);
+                }
                 return false;
             }
 
@@ -740,7 +765,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                 if (player.active && !player.dead && (player.Center - npc.Center).Length() > 1500)
                 {
                     player.velocity = Vector2.Normalize(npc.Center - player.Center) * 15;
-                    player.position = npc.Center + Vector2.Normalize(player.Center - npc.Center) * 1500;
+                    player.position += Vector2.Normalize(npc.Center - player.Center) * 15;
                     player.controlDown = false;
                     player.controlHook = false;
                     player.controlJump = false;
@@ -760,7 +785,17 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             return null;
         }
 
-
+        public override bool CheckActive()
+        {
+            if (npc.ai[0] == 3)
+            {
+                if (npc.ai[1] == 6 || npc.ai[1] == 7 || npc.ai[0] == 8)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         private void AllClear()
         {
             foreach (Projectile proj in Main.projectile)

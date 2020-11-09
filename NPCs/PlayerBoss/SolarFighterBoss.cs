@@ -1,9 +1,11 @@
-﻿using MABBossChallenge.Projectiles.PlayerBoss;
+﻿using MABBossChallenge.Buffs;
+using MABBossChallenge.Projectiles.PlayerBoss;
 using MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj;
 using MABBossChallenge.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
@@ -32,8 +34,13 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             npc.width = 38;
             npc.height = 50;
             npc.damage = 100;
-            npc.defense = 40;
-            npc.lifeMax = 50000;
+            npc.defense = 20;
+            npc.lifeMax = 40000;
+            if (!Main.expertMode)
+            {
+                npc.damage = 60;
+                npc.lifeMax = 30000;
+            }
             npc.HitSound = SoundID.NPCHit4;
             npc.DeathSound = SoundID.NPCHit4;
             npc.noGravity = true;
@@ -43,6 +50,12 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             npc.aiStyle = -1;
             npc.netAlways = true;
             npc.buffImmune[BuffID.OnFire] = true;
+            npc.buffImmune[ModContent.BuffType<SolarFlareBuff>()] = true;
+            npc.buffImmune[ModContent.BuffType<JusticeJudegmentBuff>()] = true;
+            npc.buffImmune[ModContent.BuffType<ManaFlare>()] = true;
+            npc.buffImmune[ModContent.BuffType<LifeFlare>()] = true;
+            npc.buffImmune[ModContent.BuffType<DamageFlare>()] = true;
+            npc.buffImmune[ModContent.BuffType<ImprovedCelledBuff>()] = true;
             music = mod.GetSoundSlot(SoundType.Music, "Sounds/Music/Heroic");
             musicPriority = MusicPriority.BossHigh;
             //NPCID.Sets.TrailCacheLength[npc.type] = 6;
@@ -151,6 +164,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
 
             if (npc.ai[0] == 0)               //开局
             {
+                npc.GivenName = TranslationUtils.GetTranslation("SolarDefender");
                 if (!MABWorld.DownedSolarPlayer)
                 {
                     npc.ai[2]++;
@@ -273,10 +287,16 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                 npc.ai[2]++;
                 if (npc.ai[2] == 1)
                 {
-                    music = mod.GetSoundSlot(SoundType.Music, "Sounds/Music/The Last Guardian");
+                    music = mod.GetSoundSlot(SoundType.Music, "Sounds/Music/Destiny");
                     npc.lifeMax = 300000;
-                    npc.damage = 200;
-                    npc.defense = 60;
+                    npc.damage = 180;
+                    npc.defense = 40;
+                    if (!Main.expertMode)
+                    {
+                        npc.damage = 120;
+                        npc.lifeMax = 200000;
+                        npc.defense = 20;
+                    }
                     Projectile.NewProjectile(npc.Center, Vector2.Zero, ModContent.ProjectileType<SolarRitual>(), 0, 0, default, npc.whoAmI);
                 }
                 if (npc.ai[2] == 120)
@@ -290,9 +310,10 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                 }
                 if (npc.ai[2] >= 120 && npc.ai[2] <= 240)
                 {
-                    npc.HealEffect(500);
+
                     if (npc.life < npc.lifeMax - 500)
                     {
+                        npc.HealEffect(500);
                         npc.life += 500;
                     }
                     else
@@ -386,7 +407,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                                     for (float i = -MathHelper.Pi / 2; i <= MathHelper.Pi / 2; i += MathHelper.Pi / 4)
                                     {
                                         float r = (float)Math.Atan2(RamPos.Y, RamPos.X);
-                                        int protmp = Projectile.NewProjectile(npc.Center, (i + r).ToRotationVector2() * 15, ProjectileID.DD2FlameBurstTowerT3Shot, npc.damage / 4, 0, player.whoAmI);
+                                        int protmp = Projectile.NewProjectile(npc.Center, (i + r).ToRotationVector2() * 15, ProjectileID.DD2FlameBurstTowerT3Shot, npc.damage / 4, 0);
                                         Main.projectile[protmp].hostile = true;
                                         Main.projectile[protmp].friendly = false;
                                         Main.projectile[protmp].scale = 2.0f;
@@ -502,13 +523,13 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                             {
                                 if (npc.ai[2] % 20 == 10)                   //普通长矛
                                 {
-                                    // Projectile.NewProjectile(npc.Center - new Vector2(Main.rand.Next(1000) - 500, Main.rand.Next(200)), Vector2.Zero, ModContent.ProjectileType<DayBreakHostile2>(), npc.damage / 4, 0, player.whoAmI, -1);
-                                    Projectile.NewProjectile(npc.Center, (Main.rand.NextFloat() * MathHelper.TwoPi).ToRotationVector2() * (Main.rand.Next(30) + 10), ModContent.ProjectileType<DayBreakHostile2>(), npc.damage / 4, 0, player.whoAmI, -1);
+                                    // Projectile.NewProjectile(npc.Center - new Vector2(Main.rand.Next(1000) - 500, Main.rand.Next(200)), Vector2.Zero, ModContent.ProjectileType<DayBreakHostile2>(), npc.damage / 4, 0, default, -1);
+                                    Projectile.NewProjectile(npc.Center, (Main.rand.NextFloat() * MathHelper.TwoPi).ToRotationVector2() * (Main.rand.Next(30) + 10), ModContent.ProjectileType<DayBreakHostile2>(), npc.damage / 4, 0, default, -1);
                                 }
                             }
                             if (npc.ai[2] == 330)                         //大长矛
                             {
-                                Projectile.NewProjectile(npc.Center, Vector2.Zero, ModContent.ProjectileType<DayBreakHostile2>(), npc.damage / 3, 0, player.whoAmI, npc.whoAmI);
+                                Projectile.NewProjectile(npc.Center, Vector2.Zero, ModContent.ProjectileType<DayBreakHostile2>(), npc.damage / 3, 0, default, npc.whoAmI);
                             }
                             if (npc.ai[2] > 460)
                             {
@@ -524,7 +545,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                             npc.ai[2]++;
                             if (npc.ai[2] == 30)
                             {
-                                Projectile.NewProjectile(npc.Center, Vector2.Zero, ModContent.ProjectileType<SunFuryHostile>(), npc.damage / 4, 0, Main.myPlayer, npc.whoAmI, 0);
+                                Projectile.NewProjectile(npc.Center, Vector2.Zero, ModContent.ProjectileType<SunFuryHostile>(), npc.damage / 4, 0, default, npc.whoAmI, 0);
                             }
 
                             if (npc.ai[2] == 151)
@@ -532,7 +553,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                                 Main.PlaySound(SoundID.Item1, npc.Center);
                                 Vector2 ShootVel = player.Center - npc.Center;
                                 ShootVel = Vector2.Normalize(ShootVel + player.velocity * 10);
-                                Projectile.NewProjectile(npc.Center, ShootVel * 30, ModContent.ProjectileType<SunFuryHostile>(), npc.damage / 4, 0, player.whoAmI, npc.whoAmI, 1);
+                                Projectile.NewProjectile(npc.Center, ShootVel * 30, ModContent.ProjectileType<SunFuryHostile>(), npc.damage / 4, 0, default, npc.whoAmI, 1);
                             }
                             if (npc.ai[2] > 361)
                             {
@@ -674,7 +695,11 @@ namespace MABBossChallenge.NPCs.PlayerBoss
 
         public override void NPCLoot()
         {
-
+            if (!MABWorld.DownedSolarPlayer)
+            {
+                NPC.ShieldStrengthTowerSolar = 1;
+                Projectile.NewProjectile(npc.Center, Vector2.Zero, ProjectileID.TowerDamageBolt, 0, 0f, Main.myPlayer, NPC.FindFirstNPC(NPCID.LunarTowerSolar), 0f);
+            }
             MABWorld.DownedSolarPlayer = true;
             int protmp = Projectile.NewProjectile(npc.Center, (Main.rand.NextFloat() * MathHelper.TwoPi).ToRotationVector2() * 5, ProjectileID.Tombstone, 0, 0, Main.myPlayer);
             //Main.projectile[protmp].miscText = (npc.ai[0] > 2) ? "日耀守护者" : "日耀勇士" + "被击败了，凶手是" + Main.LocalPlayer.name + "。";
@@ -704,43 +729,26 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                     NPC.ShieldStrengthTowerSolar = 1;
                 }
                 MABWorld.DownedSolarPlayerEX = true;
-                int LootNum = Main.rand.Next(10) + 30;
+                int LootNum = 114 + Main.rand.Next(514);
                 for (int i = 0; i < LootNum; i++)
                 {
                     Item.NewItem(npc.Hitbox, ItemID.FragmentSolar);
                 }
-                switch (Main.rand.Next(5))
-                {
-                    case 0:
-                        Item.NewItem(npc.Hitbox, ItemID.DayBreak);
-                        break;
-                    case 1:
-                        Item.NewItem(npc.Hitbox, ItemID.SolarEruption);
-                        break;
-                    case 2:
-                        Item.NewItem(npc.Hitbox, ItemID.Meowmere);
-                        break;
-                    case 3:
-                        Item.NewItem(npc.Hitbox, ItemID.StarWrath);
-                        break;
-                    case 4:
-                        Item.NewItem(npc.Hitbox, ItemID.Terrarian);
-                        break;
-                    default:
-                        break;
-                }
 
-                switch (Main.rand.Next(3))
+                List<int> list1 = new List<int>();
+                list1.Add(ItemID.SolarFlareBreastplate);
+                list1.Add(ItemID.SolarFlareLeggings);
+                list1.Add(ItemID.SolarFlareHelmet);
+                list1.Add(ItemID.DayBreak);
+                list1.Add(ItemID.SolarEruption);
+                list1.Add(ItemID.Meowmere);
+                list1.Add(ItemID.StarWrath);
+                list1.Add(ItemID.Terrarian);
+                for (int i = 0; i < 4; i++)
                 {
-                    case 0:
-                        Item.NewItem(npc.Hitbox, ItemID.SolarFlareBreastplate);
-                        break;
-                    case 1:
-                        Item.NewItem(npc.Hitbox, ItemID.SolarFlareLeggings);
-                        break;
-                    case 2:
-                        Item.NewItem(npc.Hitbox, ItemID.SolarFlareHelmet);
-                        break;
+                    int type = list1[Main.rand.Next(list1.Count)];
+                    list1.Remove(type);
+                    Item.NewItem(npc.Hitbox, type);
                 }
             }
 
@@ -760,6 +768,10 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                 npc.localAI[1] = 0;
                 npc.localAI[2] = 0;
                 npc.localAI[3] = 0;
+                for (int i = 0; i < 15; i++)
+                {
+                    Item.NewItem(npc.Hitbox, ItemID.Heart);
+                }
                 return false;
             }
 

@@ -1,4 +1,5 @@
-﻿using MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj;
+﻿using MABBossChallenge.Buffs;
+using MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj;
 using MABBossChallenge.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -29,8 +30,13 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             npc.width = 36;
             npc.height = 51;
             npc.damage = 100;
-            npc.defense = 40;
-            npc.lifeMax = 50000;
+            npc.defense = 20;
+            npc.lifeMax = 40000;
+            if (!Main.expertMode)
+            {
+                npc.damage = 60;
+                npc.lifeMax = 30000;
+            }
             npc.HitSound = SoundID.NPCHit4;
             npc.DeathSound = SoundID.NPCHit4;
             npc.noGravity = true;
@@ -40,6 +46,12 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             npc.aiStyle = -1;
             npc.netAlways = true;
             npc.buffImmune[BuffID.OnFire] = true;
+            npc.buffImmune[ModContent.BuffType<SolarFlareBuff>()] = true;
+            npc.buffImmune[ModContent.BuffType<JusticeJudegmentBuff>()] = true;
+            npc.buffImmune[ModContent.BuffType<ManaFlare>()] = true;
+            npc.buffImmune[ModContent.BuffType<LifeFlare>()] = true;
+            npc.buffImmune[ModContent.BuffType<DamageFlare>()] = true;
+            npc.buffImmune[ModContent.BuffType<ImprovedCelledBuff>()] = true;
             music = mod.GetSoundSlot(SoundType.Music, "Sounds/Music/Heroic");
             musicPriority = MusicPriority.BossHigh;
             //NPCID.Sets.TrailCacheLength[npc.type] = 6;
@@ -149,6 +161,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
 
             if (npc.ai[0] == 0)                  //开局
             {
+                npc.GivenName = TranslationUtils.GetTranslation("StardustDefender");
                 if (npc.ai[2] == 0)
                 {
                     Projectile.NewProjectile(npc.Center, Vector2.Zero, ModContent.ProjectileType<StardustGuardianHostile>(), npc.damage / 4, 0, player.whoAmI, npc.whoAmI);
@@ -418,6 +431,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             if (!MABWorld.DownedStardustPlayer)
             {
                 NPC.ShieldStrengthTowerStardust = 1;
+                Projectile.NewProjectile(npc.Center, Vector2.Zero, ProjectileID.TowerDamageBolt, 0, 0f, Main.myPlayer, NPC.FindFirstNPC(NPCID.LunarTowerStardust), 0f);
             }
             MABWorld.DownedStardustPlayer = true;
             int protmp = Projectile.NewProjectile(npc.Center, (Main.rand.NextFloat() * MathHelper.TwoPi).ToRotationVector2() * 5, ProjectileID.Tombstone, 0, 0, Main.myPlayer);
