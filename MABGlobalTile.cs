@@ -11,9 +11,10 @@ namespace MABBossChallenge
 {
     public class MABGlobalTile : GlobalTile
     {
+        
+        public override bool Drop(int i, int j, int type) 
+        { 
 
-        public override bool Drop(int i, int j, int type)
-        {
             if (type == TileID.Meteorite && !MABWorld.DownedMeteorPlayer)
             {
                 SummonMeteorDefender(type, i, j);

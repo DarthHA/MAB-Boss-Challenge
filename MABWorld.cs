@@ -1,4 +1,6 @@
-﻿using MABBossChallenge.Tiles;
+﻿using MABBossChallenge.Buffs;
+using MABBossChallenge.NPCs.EchDestroyer;
+using MABBossChallenge.Tiles;
 using MABBossChallenge.Walls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,8 +16,14 @@ using Terraria.World.Generation;
 
 namespace MABBossChallenge
 {
-    class MABWorld : ModWorld
+    public class MABWorld : ModWorld
     {
+        public static float CurrentTime;
+        public static int AcutalCurrentTime;
+        public static bool AutoPause = true;
+        public static bool EchActive = false;
+
+
         public static bool IsCreated;
         public static bool DownedMeteorPlayer;
         public static bool DownedMeteorPlayerEX;
@@ -25,6 +33,7 @@ namespace MABBossChallenge
         public static bool DownedVortexPlayer;
         public static bool DownedNebulaPlayer;
         public static bool DownedStardustPlayer;
+        public static bool DownedEchDestroyer;
         public static bool DownedSolarPlayerEX;
         public static bool DownedVortexPlayerEX;
         public static bool DownedNebulaPlayerEX;
@@ -40,6 +49,7 @@ namespace MABBossChallenge
             {"DownedVortexPlayer", DownedVortexPlayer},
             {"DownedNebulaPlayer", DownedNebulaPlayer},
             {"DownedStardustPlayer", DownedStardustPlayer},
+            {"DownedEchDestroyer",DownedEchDestroyer },
             {"DownedSolarPlayerEX", DownedSolarPlayerEX},
             {"DownedVortexPlayerEX", DownedVortexPlayerEX},
             {"DownedNebulaPlayerEX", DownedNebulaPlayerEX},
@@ -57,6 +67,7 @@ namespace MABBossChallenge
             DownedNebulaPlayer = false;
             DownedSolarPlayer = false;
             DownedStardustPlayer = false;
+            DownedEchDestroyer = false;
             DownedVortexPlayer = false;
             DownedSolarPlayerEX = false;
             DownedNebulaPlayerEX = false;
@@ -72,20 +83,68 @@ namespace MABBossChallenge
             DownedVortexPlayer = tag.GetBool("DownedVortexPlayer");
             DownedNebulaPlayer = tag.GetBool("DownedNebulaPlayer");
             DownedStardustPlayer = tag.GetBool("DownedStardustPlayer");
+            DownedEchDestroyer = tag.GetBool("DownedEchDestroyer");
             DownedSolarPlayerEX = tag.GetBool("DownedSolarPlayerEX");
             DownedVortexPlayerEX = tag.GetBool("DownedVortexPlayerEX");
             DownedNebulaPlayerEX = tag.GetBool("DownedNebulaPlayerEX");
 
         }
 
+        public override void PostUpdate()
+        {
+            Main.time += CurrentTime - 1;
+            if (!Main.LocalPlayer.HasBuff(ModContent.BuffType<TimeDisort>()))
+            {
+                CurrentTime = 1;
+            }
+        }
+        public override void PreUpdate()
+        {
+            if ((int)CurrentTime != CurrentTime)  
+            {
+                int b = (int)CurrentTime;
+                if (Main.rand.NextFloat() <= CurrentTime - b) 
+                {
+                    AcutalCurrentTime = 1 + b;
+                }
+                else
+                {
+                    AcutalCurrentTime = b;
+                }
+            }
+            else
+            {
+                AcutalCurrentTime = (int)CurrentTime;
+            }
 
+            if (!NPC.AnyNPCs(ModContent.NPCType<EchDestroyerHead>()))
+            {
+                if (EchActive)
+                {
+                    EchActive = false;
+                    Main.autoPause = AutoPause;
+                }
+            }
+            else
+            {
+                if (!EchActive)
+                {
+                    AutoPause = Main.autoPause;
+                    EchActive = true;
+                }
+                else
+                {
+                    Main.autoPause = false;
+                }
+            }
 
+        }
 
 
 
         private void GenBattlefield(GenerationProgress progress)
         {
-            progress.Message = "生成竞技场中……";
+            progress.Message = "Generating Battlefield...";
             bool flag = false;
             int x = 0, y = 0;
             int StoneType = WorldGen.crimson ? TileID.Crimstone : TileID.Ebonstone;

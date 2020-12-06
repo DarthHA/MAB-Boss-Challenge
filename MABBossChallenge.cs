@@ -1,6 +1,7 @@
 ﻿using MABBossChallenge.Items;
 using MABBossChallenge.NPCs.MiniPlayerBoss;
 using MABBossChallenge.NPCs.PlayerBoss;
+using MABBossChallenge.NPCs.EchDestroyer;
 using MABBossChallenge.Sky;
 using MABBossChallenge.UI;
 using MABBossChallenge.Utils;
@@ -32,18 +33,36 @@ namespace MABBossChallenge
         {
             AmmoChangeKey = RegisterHotKey("Swap Ammo Key", "Z");
 
-            Filters.Scene["MABBossChallenge:VortexBossSky"] = new Filter(new CustomScreenShaderData("FilterMiniTower").UseColor(0.255f, 0f, 0f).UseOpacity(0.2f), EffectPriority.VeryHigh);
-            SkyManager.Instance["MABBossChallenge:VortexBossSky"] = new VortexBossSky();
-
             Filters.Scene["MABBossChallenge:SolarBossSky"] = new Filter(new CustomScreenShaderData("FilterMiniTower").UseColor(0.255f, 0f, 0f).UseOpacity(0.2f), EffectPriority.VeryHigh);
             SkyManager.Instance["MABBossChallenge:SolarBossSky"] = new SolarBossSky();
+            
+            Filters.Scene["MABBossChallenge:VortexBossSky"] = new Filter(new CustomScreenShaderData("FilterMiniTower").UseColor(0.255f, 0f, 0f).UseOpacity(0.2f), EffectPriority.VeryHigh);
+            SkyManager.Instance["MABBossChallenge:VortexBossSky"] = new VortexBossSky();
 
             Filters.Scene["MABBossChallenge:NebulaBossSky"] = new Filter(new CustomScreenShaderData("FilterMiniTower").UseColor(0.255f, 0f, 0f).UseOpacity(0.2f), EffectPriority.VeryHigh);
             SkyManager.Instance["MABBossChallenge:NebulaBossSky"] = new NebulaBossSky();
 
+            Filters.Scene["MABBossChallenge:StardustBossSky"] = new Filter(new CustomScreenShaderData("FilterMiniTower").UseColor(0.255f, 0f, 0f).UseOpacity(0.2f), EffectPriority.VeryHigh);
+            SkyManager.Instance["MABBossChallenge:StardustBossSky"] = new StardustBossSky();
+
+
+
             _BossState = new BossState();
             _BossStateInterface = new UserInterface();
             _BossStateInterface.SetState(_BossState);
+
+
+            On.Terraria.Projectile.Update += new On.Terraria.Projectile.hook_Update(ProjUpdateHook);
+            On.Terraria.NPC.UpdateNPC += new On.Terraria.NPC.hook_UpdateNPC(NPCUpdateHook);
+            //On.Terraria.NPC.UpdateCollision += new On.Terraria.NPC.hook_UpdateCollision(NPCCollisionUpdate);
+            On.Terraria.Dust.UpdateDust += new On.Terraria.Dust.hook_UpdateDust(DustUpdateHook);
+            //On.Terraria.Dust.NewDust += new On.Terraria.Dust.hook_NewDust(NewDustHook);
+            On.Terraria.Star.UpdateStars += new On.Terraria.Star.hook_UpdateStars(StarUpdateHook);
+            On.Terraria.Rain.Update += new On.Terraria.Rain.hook_Update(RainUpdateHook);
+            On.Terraria.Cloud.UpdateClouds += new On.Terraria.Cloud.hook_UpdateClouds(CloudUpdateHook);
+            On.Terraria.Item.UpdateItem += new On.Terraria.Item.hook_UpdateItem(ITemUpdateHook);
+            On.Terraria.Gore.Update += new On.Terraria.Gore.hook_Update(UpdateGore);
+            On.Terraria.Player.Update += new On.Terraria.Player.hook_Update(UpdatePlayerHook);
         }
 
         public override void PostSetupContent()
@@ -83,11 +102,134 @@ namespace MABBossChallenge
             SkyManager.Instance["MABBossChallenge:SolarBossSky"].Deactivate();
             SkyManager.Instance["MABBossChallenge:VortexBossSky"].Deactivate();
             SkyManager.Instance["MABBossChallenge:NebulaBossSky"].Deactivate();
+            SkyManager.Instance["MABBossChallenge:StardustBossSky"].Deactivate();
 
-            //TabKey = null;
+            AmmoChangeKey = null;
             Instance = null;            //用于正常卸载
             mabconfig = null;
             //Environment.Exit(0);
+        }
+
+        public static void UpdateGore(On.Terraria.Gore.orig_Update orig, Gore self)
+        {
+            if (MABWorld.CurrentTime > 0) 
+            {
+                for (int i = 0; i < MABWorld.AcutalCurrentTime; i++)
+                {
+                    orig.Invoke(self);
+                }
+            }
+            
+        }
+        public static void ITemUpdateHook(On.Terraria.Item.orig_UpdateItem orig, Item self, int i)
+        {
+            if (MABWorld.CurrentTime > 0)
+            {
+                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
+                {
+                    orig.Invoke(self, i);
+                }
+            }
+        }
+        public static void CloudUpdateHook(On.Terraria.Cloud.orig_UpdateClouds orig)
+        {
+            if (MABWorld.CurrentTime > 0)
+            {
+                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
+                {
+                    orig.Invoke();
+                }
+            }
+        }
+        public static void RainUpdateHook(On.Terraria.Rain.orig_Update orig, Rain self)
+        {
+            if (MABWorld.CurrentTime > 0)
+            {
+                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
+                {
+                    orig.Invoke(self);
+                }
+            }
+        }
+        public static void StarUpdateHook(On.Terraria.Star.orig_UpdateStars orig)
+        {
+            if (MABWorld.CurrentTime > 0)
+            {
+                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
+                {
+                    orig.Invoke();
+                }
+            }
+        }
+        public static void ProjUpdateHook(On.Terraria.Projectile.orig_Update orig, Projectile self, int i)
+        {
+            if (MABWorld.CurrentTime > 0)
+            {
+                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
+                {
+                    orig.Invoke(self, i);
+                }
+            }
+            if (MABWorld.CurrentTime == 0) 
+            {
+                if (PortalUtils.ProjList.Contains(self.type))
+                {
+                    orig.Invoke(self, i);
+                }
+                else
+                {
+                    self.Damage();
+                }
+            }
+        }
+        public static void NPCUpdateHook(On.Terraria.NPC.orig_UpdateNPC orig, NPC self, int i)
+        {
+            if (MABWorld.CurrentTime > 0)
+            {
+                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
+                {
+                    orig.Invoke(self, i);
+                }
+            }
+            if (MABWorld.CurrentTime == 0)
+            {
+                if (PortalUtils.NPCList.Contains(self.type))
+                {
+                    orig.Invoke(self, i);
+                }
+            }
+
+        }
+
+        public static void DustUpdateHook(On.Terraria.Dust.orig_UpdateDust orig)
+        {
+            if (MABWorld.CurrentTime > 0)
+            {
+                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
+                {
+                    orig.Invoke();
+                }
+            }
+            if (MABWorld.CurrentTime == 0)
+            {
+                orig.Invoke();
+            }
+        }
+
+        public static void UpdatePlayerHook(On.Terraria.Player.orig_Update orig,Player self,int i)
+        {
+            if (MABWorld.CurrentTime > 0)
+            {
+                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
+                {
+                    orig.Invoke(self, i);
+                }
+            }
+            if (MABWorld.CurrentTime == 0)
+            {
+                orig.Invoke(self, i);
+            }
+
         }
 
         private void AddTrans()
@@ -98,9 +240,9 @@ namespace MABBossChallenge
             MABBossChallenge.Instance.AddTranslation(CustomText);
 
             TranslationUtils.AddTranslation("GenerateBattleWarning", "Detecting that this world hasn't generate Battlefield. Try using the Battlefield Generator to generate one!", "检测到该世界没有生成战场！尝试使用战场生成器来创建一个！");
-            TranslationUtils.AddTranslation("MeteorGuardianNPCName", "No-Name", "无名");
+            TranslationUtils.AddTranslation("MeteorGuardianNPCName", "Nameless", "无名");
             TranslationUtils.AddTranslation("TrueFight", "The real battle has just begun...", "真正的战斗才刚刚开始...");
-
+            
             TranslationUtils.AddTranslation("GuardianBro", "Evil Guardian Borthers", "邪恶守护者兄弟");
             TranslationUtils.AddTranslation("GuardianBroDescription", "Duo from the Evils", "来自邪恶之地的二重奏");
 
@@ -132,6 +274,7 @@ namespace MABBossChallenge
                 };
                 array[8] = new List<int>
                 {
+                    ItemID.RedPotion,
                     //掉落物
                 };
                 array[9] = "Spawn on the Meteorite. Become hostile when you hurt him or mining the meteorite.";
@@ -154,7 +297,8 @@ namespace MABBossChallenge
 
                 };
                 array[8] = new List<int>
-                {
+                {                    
+                    ItemID.RedPotion,
                     //掉落物
                 };
                 array[9] = "Putting a [i:" + ItemID.ShadowScale + "] into the Strange Demon Altar in the Battlefield on Corruption.";
@@ -177,6 +321,7 @@ namespace MABBossChallenge
                 };
                 array[8] = new List<int>
                 {
+                    ItemID.RedPotion,
                     //掉落物
                 };
                 array[9] = "Putting a [i:" + ItemID.TissueSample + "] into the Strange Crimson Altar in the Battlefield on Crimson.";
@@ -289,7 +434,27 @@ namespace MABBossChallenge
 
 
 
+                mod1 = bossChecklist;
+                array = new object[12];
+                array[0] = "AddBoss";
+                array[1] = 14.1f;
+                array[2] = ModContent.NPCType<EchDestroyerHead>();
+                array[3] = Instance;
+                array[4] = "Warp Destroyer";
+                array[5] = new Func<bool>(() => MABWorld.DownedEchDestroyer);
+                array[6] = ModContent.ItemType<EchSummon>();
+                array[7] = new List<int>
+                {
+                    //ItemID.DestroyerMask,
+                    //ItemID.DestroyerTrophy,
+                };
+                array[8] = new List<int>
+                {
 
+                };
+                array[9] = "Using [i:" + ModContent.ItemType<EchSummon>() + "] to summon.";
+                array[11] = "MABBossChallenge/BossChecklist/WarpDestroyer_BCL";
+                mod1.Call(array);
 
                 mod1 = bossChecklist;
                 array = new object[12];
@@ -399,8 +564,60 @@ namespace MABBossChallenge
                 mod2.Call("AddSummon", 13.5f, "MABBossChallenge", "PlayerSummon3", (Func<bool>)(() => MABWorld.DownedNebulaPlayer), Item.buyPrice(0, 8, 0, 0)); //1f is a dummy value and not used
                 mod2.Call("AddSummon", 13.5f, "MABBossChallenge", "PlayerSummon4", (Func<bool>)(() => MABWorld.DownedStardustPlayer), Item.buyPrice(0, 8, 0, 0)); //1f is a dummy value and not used
                 mod2.Call("AddSummon", 13.6f, "MABBossChallenge", "PlayerSummon", (Func<bool>)(() => MABWorld.DownedStardustPlayer && MABWorld.DownedNebulaPlayer && MABWorld.DownedVortexPlayer && MABWorld.DownedSolarPlayer), Item.buyPrice(0, 32, 0, 0)); //1f is a dummy value and not used
-                mod2.Call("AddSummon", 17f, "MABBossChallenge", "PlayerSummonEX", (Func<bool>)(() => (MABWorld.DownedSolarPlayerEX && MABWorld.DownedVortexPlayerEX)), Item.buyPrice(1, 0, 0, 0)); //1f is a dummy value and not used
+                mod2.Call("AddSummon", 14.1f, "MABBossChallenge", "EchSummon", (Func<bool>)(() => MABWorld.DownedEchDestroyer), Item.buyPrice(0, 15, 0, 0)); //1f is a dummy value and not used
+                mod2.Call("AddSummon", 17f, "MABBossChallenge", "PlayerSummonEX", (Func<bool>)(() => (MABWorld.DownedSolarPlayerEX && MABWorld.DownedVortexPlayerEX && MABWorld.DownedNebulaPlayerEX)), Item.buyPrice(1, 0, 0, 0)); //1f is a dummy value and not used
             }
+
+
+
+        }
+    }
+
+    public class TimeStopGlobalNPC : GlobalNPC
+    {
+        public override bool? CanBeHitByProjectile(NPC npc, Projectile projectile)
+        {
+            if (MABWorld.CurrentTime == 0)
+            {
+                return false;
+            }
+            return null;
+
+        }
+    }
+
+    public class TimeStopGlobalProjectile : GlobalProjectile
+    {
+        public override bool InstancePerEntity => true;
+        public int StopProj = 0;
+        public static readonly int UnCertain = 0;
+        public static readonly int Stopped = 1;
+        public static readonly int Unstopped = -1;
+        public override bool PreAI(Projectile projectile)
+        {
+            if (MABWorld.CurrentTime > 0)
+            {
+                if (StopProj == UnCertain)
+                {
+                    StopProj = Unstopped;
+                }
+                if (StopProj == Stopped)
+                {
+                    if (projectile.friendly)
+                    {
+                        projectile.active = false;
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                if (StopProj == UnCertain)
+                {
+                    StopProj = Stopped;
+                }
+            }
+            return true;
         }
     }
 }
