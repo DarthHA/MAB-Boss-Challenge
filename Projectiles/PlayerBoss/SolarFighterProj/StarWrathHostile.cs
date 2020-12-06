@@ -29,11 +29,16 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
             projectile.damage = 10;
             projectile.penetrate = -1;
             projectile.netImportant = true;
+            cooldownSlot = 1;
         }
         public override void AI()
         {
             NPC owner = Main.npc[(int)projectile.ai[0]];
-            if (!owner.active || owner.type != ModContent.NPCType<SolarFighterBoss>()) projectile.Kill();
+            if (!owner.active || owner.type != ModContent.NPCType<SolarFighterBoss>()) 
+            {
+                projectile.Kill();
+                return;
+            }
             Player target = Main.player[owner.target];
             projectile.spriteDirection = owner.spriteDirection;
             projectile.direction = owner.direction;
@@ -43,7 +48,8 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
 
             if (projectile.timeLeft % 20 == 2)
             {
-                for (int i = 0; i < 3; i++)
+                int count = 2 + Main.rand.Next(2);
+                for (int i = 0; i < count; i++)
                 {
                     float r = Main.rand.NextFloat() * MathHelper.Pi;
                     //int protmp = Projectile.NewProjectile(new Vector2(owner.Center.X, Main.screenPosition.Y - 50), new Vector2(Main.rand.Next(5) - 2, 10), ProjectileID.StarWrath, projectile.damage, 0,target.whoAmI);
@@ -76,8 +82,9 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
 
         public override void OnHitPlayer(Player target, int damage, bool crit)
         {
-            target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
-            target.AddBuff(BuffID.OnFire, 300);
+            //target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            //target.AddBuff(BuffID.OnFire, 300);
+            target.AddBuff(BuffID.BrokenArmor, 240);
         }
 
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)

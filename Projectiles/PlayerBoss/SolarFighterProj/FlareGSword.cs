@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using MABBossChallenge.NPCs.PlayerBoss;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
@@ -36,7 +37,11 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
             projectile.width = (int)(54 * projectile.scale);
             projectile.height = (int)(54 * projectile.scale);
             NPC owner = Main.npc[(int)projectile.ai[0]];
-            if (!owner.active) projectile.Kill();
+            if (!owner.active || owner.type != ModContent.NPCType<SolarFighterBoss>())  
+            {
+                projectile.Kill();
+                return;
+            }
 
             Dust dust = Main.dust[Dust.NewDust(projectile.position + new Vector2(owner.direction * 30, 0), projectile.width, projectile.height, 6, 0f, 0f, 100, default, 1f)];
             dust.noGravity = true;
@@ -47,6 +52,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
             if (owner.ai[1] != 7 && owner.ai[1] != 8)
             {
                 projectile.Kill();
+                return;
             }
             projectile.Center = owner.Center;
             Player target = Main.player[owner.target];

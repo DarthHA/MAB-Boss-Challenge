@@ -32,6 +32,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
             projectile.tileCollide = false;
 			projectile.timeLeft = 9999;
 			projectile.scale = 0.1f;
+			cooldownSlot = 1;
         }
 		public override void AI()
 		{
@@ -157,7 +158,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
 			Projectile owner = Main.projectile[(int)projectile.ai[1]];
             if (owner.type == ModContent.ProjectileType<LastPrismHostile2>())
             {
-				return projectile.scale >= 0.7f;
+				return projectile.scale >= 0.4f;
             }
 			return projectile.scale >= 1.4f;
         }

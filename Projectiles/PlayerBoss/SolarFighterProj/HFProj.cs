@@ -30,6 +30,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
             projectile.ignoreWater = true;
             projectile.damage = 10;
             projectile.penetrate = -1;
+            cooldownSlot = 1;
         }
         public override void AI()
         {
@@ -69,11 +70,15 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
 
         public override void OnHitPlayer(Player target, int damage, bool crit)
         {
-            target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            //target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            target.AddBuff(BuffID.OnFire, 300);
+            target.AddBuff(BuffID.Burning, 120);
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            //target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            target.AddBuff(BuffID.OnFire, 300);
+            target.AddBuff(BuffID.Burning, 120);
         }
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {

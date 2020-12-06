@@ -86,6 +86,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
                 int protmp = Projectile.NewProjectile(target.Center, Vector2.Zero, ProjectileID.SolarWhipSwordExplosion, projectile.damage, 0, Main.myPlayer);
                 Main.projectile[protmp].hostile = true;
                 Main.projectile[protmp].friendly = false;
+                Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
             }
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
@@ -96,6 +97,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
                 int protmp = Projectile.NewProjectile(target.Center, Vector2.Zero, ProjectileID.SolarWhipSwordExplosion, projectile.damage, 0, Main.myPlayer);
                 Main.projectile[protmp].hostile = true;
                 Main.projectile[protmp].friendly = false;
+                Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
             }
         }
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)

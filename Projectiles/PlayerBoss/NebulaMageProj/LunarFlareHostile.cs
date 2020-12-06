@@ -28,6 +28,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
             projectile.hostile = true;
             projectile.friendly = false;
 			projectile.scale = 1.6f;
+			cooldownSlot = 1;
         }
 		public override void AI()
 		{

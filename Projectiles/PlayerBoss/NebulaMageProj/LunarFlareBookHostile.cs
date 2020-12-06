@@ -5,7 +5,6 @@ using Terraria.Localization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using MentalAIBoost.Projectiles.DestroyerEXProj;
 
 namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
 {

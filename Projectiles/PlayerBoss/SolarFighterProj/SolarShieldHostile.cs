@@ -32,7 +32,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
         }
         public override void AI()
         {
-            if (!Main.npc[(int)projectile.ai[0]].active || Main.npc[(int)projectile.ai[0]].type != ModContent.NPCType<SolarFighterBoss>()) projectile.Kill();
+            if (!Main.npc[(int)projectile.ai[0]].active || Main.npc[(int)projectile.ai[0]].type != ModContent.NPCType<SolarFighterBoss>()) 
+            {
+                projectile.Kill(); return; 
+            }
             projectile.Center = Main.npc[(int)projectile.ai[0]].Center;
             projectile.ai[1]++;
             projectile.spriteDirection = Main.npc[(int)projectile.ai[0]].spriteDirection;
@@ -71,6 +74,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
             int protmp = Projectile.NewProjectile(target.Center, Vector2.Zero, ProjectileID.SolarCounter, projectile.damage, 0, Main.myPlayer);
             Main.projectile[protmp].hostile = true;
             Main.projectile[protmp].friendly = false;
+            Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
             Main.projectile[protmp].Kill();
         }
 
@@ -83,6 +87,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
             int protmp = Projectile.NewProjectile(target.Center, Vector2.Zero, ProjectileID.SolarCounter, projectile.damage, 0, Main.myPlayer);
             Main.projectile[protmp].hostile = true;
             Main.projectile[protmp].friendly = false;
+            Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
             Main.projectile[protmp].Kill();
         }
     

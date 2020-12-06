@@ -12,7 +12,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
     public class SolarFlameBlast : ModProjectile
     {
         public override string Texture => "Terraria/Projectile_664";
-
+        public override bool Autoload(ref string name)
+        {
+            return false;
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Flame Blast");

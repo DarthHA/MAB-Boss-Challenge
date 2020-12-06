@@ -9,6 +9,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
 {
     public class SolarArena : ModProjectile
     {
+        public override bool Autoload(ref string name)
+        {
+            return false;
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("");

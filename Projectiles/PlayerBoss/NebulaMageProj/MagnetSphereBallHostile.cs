@@ -7,7 +7,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-namespace MentalAIBoost.Projectiles.DestroyerEXProj
+namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
 {
     class MagnetSphereBallHostile : ModProjectile
     {
@@ -32,6 +32,7 @@ namespace MentalAIBoost.Projectiles.DestroyerEXProj
             projectile.ignoreWater = true;
             projectile.damage = 10;
             projectile.penetrate = -1;
+            cooldownSlot = 1;
         }
 
         public override void AI()

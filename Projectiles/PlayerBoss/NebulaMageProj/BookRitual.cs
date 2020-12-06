@@ -15,6 +15,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
             DisplayName.SetDefault("Book Ritual");
             DisplayName.AddTranslation(GameCulture.Chinese, "法书法阵");
         }
+        public override bool Autoload(ref string name)
+        {
+            return false;
+        }
 
         public override void SetDefaults()
         {

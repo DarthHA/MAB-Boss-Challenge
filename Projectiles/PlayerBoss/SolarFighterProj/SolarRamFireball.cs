@@ -41,7 +41,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
                 projectile.frame = (projectile.frame + 1) % 4;
             }
         }
-
+        public override bool CanDamage()
+        {
+            return projectile.timeLeft < 100;
+        }
         public override void Kill(int timeLeft)
         {
             int protmp = Projectile.NewProjectile(projectile.Center, Vector2.Zero, ProjectileID.SolarCounter, projectile.damage, 0);
@@ -68,12 +71,12 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
 
         public override void OnHitPlayer(Player target, int damage, bool crit)
         {
-            target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            //target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
             target.AddBuff(BuffID.OnFire, 300);
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            //target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
             target.AddBuff(BuffID.OnFire, 300);
         }
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)

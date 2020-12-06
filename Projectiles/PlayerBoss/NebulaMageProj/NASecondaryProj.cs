@@ -29,7 +29,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
             projectile.tileCollide = false;
             projectile.penetrate = -1;
             projectile.timeLeft = 420;
-
+            cooldownSlot = 1;
         }
 
         public override void AI()

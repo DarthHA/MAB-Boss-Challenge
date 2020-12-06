@@ -1,4 +1,5 @@
-﻿using MABBossChallenge.Buffs;
+﻿using Terraria.ID;
+using MABBossChallenge.Buffs;
 using MABBossChallenge.NPCs.PlayerBoss;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -33,7 +34,11 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
         public override void AI()
         {
             NPC owner = Main.npc[(int)projectile.ai[0]];
-            if (!owner.active || owner.type != ModContent.NPCType<SolarFighterBoss>()) projectile.Kill();
+            if (!owner.active || owner.type != ModContent.NPCType<SolarFighterBoss>()) 
+            {
+                projectile.Kill();
+                return;
+            }
             projectile.rotation += 0.5f;
             if (projectile.timeLeft > 60)
             {
@@ -102,11 +107,15 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
 
         public override void OnHitPlayer(Player target, int damage, bool crit)
         {
-            target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            //target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            target.AddBuff(BuffID.OnFire, 300);
+            target.AddBuff(BuffID.Burning, 300);
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            //target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            target.AddBuff(BuffID.OnFire, 300);
+            target.AddBuff(BuffID.Burning, 300);
         }
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {

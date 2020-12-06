@@ -27,6 +27,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
             projectile.damage = 0;
             projectile.penetrate = -1;
             projectile.netImportant = true;
+           
         }
         public override void AI()
         {

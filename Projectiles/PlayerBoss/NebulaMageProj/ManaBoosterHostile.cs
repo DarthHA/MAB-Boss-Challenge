@@ -13,6 +13,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
         {
             DisplayName.SetDefault("Mana Flare");
             DisplayName.AddTranslation(GameCulture.Chinese, "魔法强化焰");
+            Main.projFrames[projectile.type] = 4;
         }
         public override void SetDefaults()
         {
@@ -31,6 +32,14 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
         }
         public override void AI()
         {
+            projectile.frameCounter++;
+            if (projectile.frameCounter >= 5)
+            {
+                projectile.frameCounter = 0;
+                projectile.frame++;
+                if (projectile.frame > 3) projectile.frame = 0;
+            }
+
             projectile.ai[1]++;
             if (projectile.ai[1] <= 40)
             {
@@ -74,13 +83,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
         {
-            projectile.frameCounter++;
-            if (projectile.frameCounter >= 5)
-            {
-                projectile.frameCounter = 0;
-                projectile.frame++;
-                if (projectile.frame > 3) projectile.frame = 0;
-            }
+
             Rectangle TexFrame = new Rectangle(0, 28 * projectile.frame, 18, 28);
             Texture2D tex = Main.projectileTexture[projectile.type];
             spriteBatch.Draw(tex, projectile.Center - Main.screenPosition, TexFrame, Color.White * projectile.Opacity, 0, TexFrame.Size() * 0.5f, 1, SpriteEffects.None, 0); ;

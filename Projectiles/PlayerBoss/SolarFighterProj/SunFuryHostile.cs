@@ -33,7 +33,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
         public override void AI()
         {
             NPC owner = Main.npc[(int)projectile.ai[0]];
-            if (!owner.active || owner.type != ModContent.NPCType<SolarFighterBoss>()) projectile.Kill();
+            if (!owner.active || owner.type != ModContent.NPCType<SolarFighterBoss>()) 
+            {
+                projectile.Kill(); return;
+            }
             if (projectile.ai[1] == 0)          //旋转状态
             {
                 projectile.localAI[1]++;
@@ -45,7 +48,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
                 {
                     projectile.Kill();
                 }
-                if (projectile.localAI[1] % 3 == 2)
+                if (projectile.localAI[1] % 4 == 2)
                 {
                     Vector2 Vel = Vector2.Normalize(projectile.Center - owner.Center);
                     int protmp = Projectile.NewProjectile(projectile.Center, Vel * 15, ProjectileID.DD2FlameBurstTowerT3Shot, projectile.damage, 0);
@@ -77,22 +80,22 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
                         Main.projectile[protmp1].hostile = true;
                         Main.projectile[protmp1].friendly = false;
                         Main.projectile[protmp1].scale = 2.0f;
-                        Main.projectile[protmp].tileCollide = false;
-                        Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
+                        Main.projectile[protmp1].tileCollide = false;
+                        Main.projectile[protmp1].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
 
                         protmp1 = Projectile.NewProjectile(projectile.Center, (i + r + MathHelper.Pi / 32).ToRotationVector2() * 10, ProjectileID.DD2FlameBurstTowerT3Shot, projectile.damage, 0);
                         Main.projectile[protmp1].hostile = true;
                         Main.projectile[protmp1].friendly = false;
                         Main.projectile[protmp1].scale = 2.0f;
-                        Main.projectile[protmp].tileCollide = false;
-                        Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
+                        Main.projectile[protmp1].tileCollide = false;
+                        Main.projectile[protmp1].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
 
                         protmp1 = Projectile.NewProjectile(projectile.Center, (i + r).ToRotationVector2() * 5, ProjectileID.DD2FlameBurstTowerT3Shot, projectile.damage, 0);
                         Main.projectile[protmp1].hostile = true;
                         Main.projectile[protmp1].friendly = false;
                         Main.projectile[protmp1].scale = 2.0f;
-                        Main.projectile[protmp].tileCollide = false;
-                        Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
+                        Main.projectile[protmp1].tileCollide = false;
+                        Main.projectile[protmp1].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
 
                     }
                 }
@@ -147,13 +150,17 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
 
         public override void OnHitPlayer(Player target, int damage, bool crit)
         {
-            target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            //target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
             target.AddBuff(BuffID.OnFire, 300);
+            target.AddBuff(BuffID.Burning, 300);
+            target.AddBuff(BuffID.Dazed, 120);
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            //target.AddBuff(ModContent.BuffType<SolarFlareBuff>(), (Main.rand.Next(3) + 3) * 60);
+            target.AddBuff(BuffID.OnFire, 300);
             target.AddBuff(BuffID.Burning, 300);
+            target.AddBuff(BuffID.Dazed, 120);
         }
         public override void ModifyHitPlayer(Player target, ref int damage, ref bool crit)
         {

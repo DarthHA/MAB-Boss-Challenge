@@ -8,6 +8,10 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.SolarFighterProj
 {
     public class SolarRing : ModProjectile
     {
+        public override bool Autoload(ref string name)
+        {
+            return false;
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("日耀守护者");
