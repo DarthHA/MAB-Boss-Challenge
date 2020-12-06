@@ -24,6 +24,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
             projectile.scale = 1.2f;
             projectile.timeLeft = 600;
             projectile.tileCollide = false;
+            cooldownSlot = 1;
         }
         public override void AI()
         {

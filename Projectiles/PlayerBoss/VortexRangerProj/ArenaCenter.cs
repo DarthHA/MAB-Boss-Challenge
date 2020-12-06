@@ -61,7 +61,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
             }
             for (float i = 0; i < MathHelper.TwoPi; i += MathHelper.Pi / 1000)
             {
-                spriteBatch.Draw(Main.magicPixel, projectile.Center + i.ToRotationVector2() * r - Main.screenPosition, new Rectangle(0, 0, 1, 1), Color.DarkSeaGreen, 0, Vector2.Zero, 4, SpriteEffects.None, 0);
+                spriteBatch.Draw(Main.magicPixel, projectile.Center + i.ToRotationVector2() * r - Main.screenPosition, new Rectangle(0, 0, 1, 1), Color.DarkSeaGreen, i, Vector2.Zero, 6, SpriteEffects.None, 0);
             }
             return false;
         }

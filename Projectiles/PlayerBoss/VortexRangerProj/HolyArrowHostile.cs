@@ -24,6 +24,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
             projectile.friendly = false;
             projectile.hostile = true;
             projectile.timeLeft = 100;
+            cooldownSlot = 1;
         }
         public override void AI()
         {

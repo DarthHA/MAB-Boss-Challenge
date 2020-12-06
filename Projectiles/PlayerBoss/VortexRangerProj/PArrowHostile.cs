@@ -23,8 +23,9 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
             projectile.ignoreWater = true;
             projectile.extraUpdates = 1;
             projectile.timeLeft = 50;
-
+            cooldownSlot = 1;
         }
+
         public override void AI()
         {
             Player target = Main.player[Player.FindClosest(projectile.Center, 1, 1)];

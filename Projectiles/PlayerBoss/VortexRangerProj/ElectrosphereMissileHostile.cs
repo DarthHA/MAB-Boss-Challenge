@@ -31,8 +31,8 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
             Player target = Main.player[Player.FindClosest(projectile.Center, 1, 1)];
             projectile.tileCollide = Collision.CanHitLine(projectile.position, projectile.width, projectile.height, target.position, target.width, target.height);
             projectile.rotation = (float)Math.Atan2(projectile.velocity.Y, projectile.velocity.X) + MathHelper.Pi / 2;
-            if (projectile.ai[0] > 1000 || projectile.ai[0] < 0) projectile.Kill();
-            if (!Main.projectile[(int)projectile.ai[0]].active || Main.projectile[(int)projectile.ai[0]].type != ModContent.ProjectileType<BulletCenter>()) projectile.Kill();
+            if (projectile.ai[0] > 1000 || projectile.ai[0] < 0) { projectile.Kill(); return; }
+            if (!Main.projectile[(int)projectile.ai[0]].active || Main.projectile[(int)projectile.ai[0]].type != ModContent.ProjectileType<BulletCenter>()) { projectile.Kill(); return; }
             projectile.Center = Main.projectile[(int)projectile.ai[0]].Center + projectile.ai[1].ToRotationVector2() * (300 - projectile.timeLeft) * 10;
         }
         public override bool CanDamage()

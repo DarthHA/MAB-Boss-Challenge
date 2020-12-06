@@ -29,9 +29,8 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
             projectile.ignoreWater = true;
             projectile.damage = 10;
             projectile.penetrate = -1;
-            Main.projFrames[projectile.type] = 4;
             projectile.netImportant = true;
-
+            cooldownSlot = 1;
         }
 
         public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)

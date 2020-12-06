@@ -18,6 +18,7 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
         {
             DisplayName.SetDefault("Stardust Jotaro");
             DisplayName.AddTranslation(GameCulture.Chinese, "星承守卫");
+            Main.projFrames[projectile.type] = 19;   //前8帧静息，9-12聚怪，13-19欧拉
         }
         public override void SetDefaults()
         {
@@ -31,9 +32,9 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
             projectile.ignoreWater = true;
             projectile.damage = 10;
             projectile.penetrate = -1;
-            Main.projFrames[projectile.type] = 19;   //前8帧静息，9-12聚怪，13-19欧拉
             projectile.netImportant = true;
             projectile.hide = true;
+            cooldownSlot = 1;
         }
         public override void DrawBehind(int index, List<int> drawCacheProjsBehindNPCsAndTiles, List<int> drawCacheProjsBehindNPCs, List<int> drawCacheProjsBehindProjectiles, List<int> drawCacheProjsOverWiresUI)
         {
@@ -75,7 +76,11 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
 
         public override void AI()
         {
-            if (!Main.npc[(int)projectile.ai[0]].active || Main.npc[(int)projectile.ai[0]].type != ModContent.NPCType<StardustSummonerBoss>()) projectile.Kill();
+            if (!Main.npc[(int)projectile.ai[0]].active || Main.npc[(int)projectile.ai[0]].type != ModContent.NPCType<StardustSummonerBoss>()) 
+            {
+                projectile.Kill();
+                return;
+            }
             NPC owner = Main.npc[(int)projectile.ai[0]];
             Player target = Main.player[projectile.owner];
             if (projectile.ai[1] == 0)              //跟随召唤师

@@ -27,9 +27,9 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.StardustSummonerProj
             projectile.tileCollide = false;
             projectile.ignoreWater = true;
             projectile.damage = 10;
-            //projectile.penetrate = -1;
-            Main.projFrames[projectile.type] = 4;
+            projectile.penetrate = -1;
 
+            cooldownSlot = 1;
         }
 
         public override void AI()

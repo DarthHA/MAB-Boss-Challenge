@@ -28,7 +28,6 @@ namespace MABBossChallenge.Projectiles.PlayerBoss.VortexRangerProj
             projectile.penetrate = 4;
             projectile.friendly = false;
             projectile.hostile = true;
-
         }
         public override void AI()
         {
