@@ -724,10 +724,6 @@ namespace MABBossChallenge.NPCs.PlayerBoss
             }
             if (npc.ai[0] == 3)
             {
-                if (!MABWorld.DownedSolarPlayer)
-                {
-                    NPC.ShieldStrengthTowerSolar = 1;
-                }
                 MABWorld.DownedSolarPlayerEX = true;
                 int LootNum = 114 + Main.rand.Next(514);
                 for (int i = 0; i < LootNum; i++)

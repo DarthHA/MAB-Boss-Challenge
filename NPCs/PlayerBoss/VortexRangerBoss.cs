@@ -407,7 +407,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                     case 2:             //星璇机枪2
                         {
                             Vector2 Pos = player.Center + new Vector2(400, 0) * npc.localAI[0];
-                            Movement(Pos, 0.4f, true);
+                            Movement(Pos, 0.5f, true);
                             npc.ai[2]++;
 
                             if (npc.ai[2] == 30)
@@ -440,7 +440,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                                 {
                                     if (proj.active && (proj.type == ProjectileID.HallowStar || proj.type == ModContent.ProjectileType<HolyArrowHostile>()) && proj.hostile) 
                                     {
-                                        proj.Kill();
+                                        proj.active = false;
                                     }
                                 }
                             }
@@ -449,7 +449,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
 
                     case 4:                  //玛瑙
                         {
-                            int moved = (npc.ai[3] == 1) ? 600 : 350;
+                            int moved = (npc.ai[3] == 1) ? 600 : 375;
                             Movement(player.Center + Vector2.Normalize(npc.Center - player.Center) * moved, 0.3f, true);
                             npc.ai[2]++;
                             if (npc.ai[2] == 40)
@@ -699,14 +699,16 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                 }
 
 
-                List<int> list1 = new List<int>();
-                list1.Add(ItemID.VortexBreastplate);
-                list1.Add(ItemID.VortexHelmet);
-                list1.Add(ItemID.VortexLeggings);
-                list1.Add(ItemID.Phantasm);
-                list1.Add(ItemID.VortexBeater);
-                list1.Add(ItemID.SDMG);
-                list1.Add(ItemID.FireworksLauncher);
+                List<int> list1 = new List<int>
+                {
+                    ItemID.VortexBreastplate,
+                    ItemID.VortexHelmet,
+                    ItemID.VortexLeggings,
+                    ItemID.Phantasm,
+                    ItemID.VortexBeater,
+                    ItemID.SDMG,
+                    ItemID.FireworksLauncher
+                };
                 for (int i = 0; i < 4; i++)
                 {
                     int type = list1[Main.rand.Next(list1.Count)];
@@ -787,7 +789,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
 
         public override bool CheckActive()
         {
-            if (npc.ai[0] == 3)
+            if (npc.ai[0] == 3 && Main.player[npc.target].active && !Main.player[npc.target].dead)
             {
                 if (npc.ai[1] == 6 || npc.ai[1] == 7 || npc.ai[0] == 8)
                 {

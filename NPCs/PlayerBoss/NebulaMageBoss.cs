@@ -2,7 +2,6 @@
 using MABBossChallenge.Projectiles.PlayerBoss;
 using MABBossChallenge.Projectiles.PlayerBoss.NebulaMageProj;
 using MABBossChallenge.Utils;
-using MentalAIBoost.Projectiles.DestroyerEXProj;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Steamworks;
@@ -877,7 +876,7 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                                 
                                 if (npc.ai[2] % 60 == 0)
                                 {
-                                    Vector2 RamVel = Vector2.Normalize(player.Center + player.velocity * (25 - t * 5) - npc.Center + new Vector2(0.01f, 0));
+                                    Vector2 RamVel = Vector2.Normalize(player.Center + player.velocity * (35 - t * 10) - npc.Center + new Vector2(0.01f, 0));
                                     
                                     npc.velocity = RamVel * 45;
                                     if (t == 1)
@@ -1096,8 +1095,8 @@ namespace MABBossChallenge.NPCs.PlayerBoss
                             {
                                 npc.dontTakeDamage = false;
                                 npc.life = 0;
-                                npc.HitEffect();
                                 npc.checkDead();
+                                
                             }
                         }
                         break;
@@ -1386,8 +1385,9 @@ namespace MABBossChallenge.NPCs.PlayerBoss
         }
         public override bool CheckActive()
         {
-            if (npc.ai[0] == 3)
+            if (npc.ai[0] == 3 && Main.player[npc.target].active && !Main.player[npc.target].dead)
             {
+
                 if (npc.ai[1] == 3 || npc.ai[1] == 5 || npc.ai[1] == 8 || npc.ai[1] == 9)
                 {
                     return false;
