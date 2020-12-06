@@ -30,6 +30,7 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer
             projectile.damage = 10;
             projectile.penetrate = -1;
             projectile.netImportant = true;
+            cooldownSlot = 1;
         }
         public override void AI()
         {
@@ -97,6 +98,7 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer
             }
             damage += target.statDefense / 2;
         }
+
         public override void OnHitPlayer(Player target, int damage, bool crit)
         {
             target.AddBuff(BuffID.Burning, 60);

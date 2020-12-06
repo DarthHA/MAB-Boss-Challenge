@@ -12,8 +12,7 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.ShadowPlayer
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Shadow Spilt");
-            DisplayName.AddTranslation(GameCulture.Chinese, "暗影剑痕");
-            DisplayName.SetDefault("暗影剑光");      //31 42
+            DisplayName.AddTranslation(GameCulture.Chinese, "暗影剑痕"); //31 42    
         }
         public override void SetDefaults()
         {

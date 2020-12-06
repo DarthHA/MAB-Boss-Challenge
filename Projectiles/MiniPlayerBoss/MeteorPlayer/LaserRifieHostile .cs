@@ -10,16 +10,16 @@ using Terraria.ModLoader;
 
 namespace MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer
 {
-    public class SpaceGunHostile : ModProjectile
+    public class LaserRifieHostile : ModProjectile
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Space Gun");
-            DisplayName.AddTranslation(GameCulture.Chinese, "空间枪");
+            DisplayName.SetDefault("Laser Rifie");
+            DisplayName.AddTranslation(GameCulture.Chinese, "激光步枪");
         }
         public override void SetDefaults()
         {
-            projectile.width = 35;
+            projectile.width = 40;
             projectile.height = 20;
             projectile.scale = 1.0f;
             projectile.friendly = false;
@@ -54,14 +54,11 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer
 
             if (owner.ai[2] > 1)
             {
-                if (owner.ai[2] % 12 == 2 && owner.ai[2] < 60 && owner.ai[2] > 12)
+                if (owner.ai[2] % 6 == 2 && owner.ai[2] < 60 && owner.ai[2] > 12)
                 {
-                    float PredictIndex = 1 / 5;
-                    if (owner.life < owner.lifeMax / 3 * 2) PredictIndex = 1 / 4;
-                    if (owner.life < owner.lifeMax / 3) PredictIndex = 1 / 3;
-                    if (Main.hardMode && MABWorld.DownedMeteorPlayer) PredictIndex = 1 / 2;
+                    float PredictIndex = 3 / 4;
                     Main.PlaySound(SoundID.Item12, projectile.Center);
-                    int protmp = Projectile.NewProjectile(projectile.Center, Facing * 25 + target.velocity * PredictIndex, ProjectileID.GreenLaser, projectile.damage, 0);
+                    int protmp = Projectile.NewProjectile(projectile.Center, Facing * 25 + target.velocity * PredictIndex, ProjectileID.PurpleLaser, projectile.damage, 0);
                     Main.projectile[protmp].hostile = true;
                     Main.projectile[protmp].friendly = false;
                     Main.projectile[protmp].tileCollide = false;
@@ -77,6 +74,7 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer
             if (owner.ai[1] > 5)
             {
                 projectile.Kill();
+                return;
             }
 
         }

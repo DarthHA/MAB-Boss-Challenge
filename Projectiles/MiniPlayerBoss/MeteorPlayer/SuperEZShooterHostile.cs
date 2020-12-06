@@ -1,25 +1,24 @@
 ﻿using MABBossChallenge.NPCs.MiniPlayerBoss;
-using MABBossChallenge.Projectiles.PlayerBoss;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
-using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ID;
 
 namespace MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer
 {
-    public class SpaceGunHostile : ModProjectile
+    public class SuperEZShooterHostile : ModProjectile
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Space Gun");
-            DisplayName.AddTranslation(GameCulture.Chinese, "空间枪");
+            DisplayName.SetDefault("Super Star Shooter");
+            DisplayName.AddTranslation(GameCulture.Chinese,"超星炮");
         }
         public override void SetDefaults()
         {
-            projectile.width = 35;
+            projectile.width = 36;
             projectile.height = 20;
             projectile.scale = 1.0f;
             projectile.friendly = false;
@@ -36,7 +35,8 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer
             NPC owner = Main.npc[(int)projectile.ai[0]];
             if (!owner.active || owner.type != ModContent.NPCType<MeteorPlayerBoss>())
             {
-                projectile.Kill(); return;
+                projectile.Kill();
+                return;
             }
             Player target = Main.player[owner.target];
             projectile.spriteDirection = owner.spriteDirection;
@@ -52,31 +52,23 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer
                 projectile.rotation = (float)Math.Atan2(Facing.Y, Facing.X) - MathHelper.Pi / 2;
             }
 
-            if (owner.ai[2] > 1)
+            if (owner.ai[1] == 4)
             {
-                if (owner.ai[2] % 12 == 2 && owner.ai[2] < 60 && owner.ai[2] > 12)
+                if (owner.ai[2] == 40)
                 {
-                    float PredictIndex = 1 / 5;
-                    if (owner.life < owner.lifeMax / 3 * 2) PredictIndex = 1 / 4;
-                    if (owner.life < owner.lifeMax / 3) PredictIndex = 1 / 3;
-                    if (Main.hardMode && MABWorld.DownedMeteorPlayer) PredictIndex = 1 / 2;
-                    Main.PlaySound(SoundID.Item12, projectile.Center);
-                    int protmp = Projectile.NewProjectile(projectile.Center, Facing * 25 + target.velocity * PredictIndex, ProjectileID.GreenLaser, projectile.damage, 0);
-                    Main.projectile[protmp].hostile = true;
-                    Main.projectile[protmp].friendly = false;
-                    Main.projectile[protmp].tileCollide = false;
-                    Main.projectile[protmp].magic = false;
-                    Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
-                }
-                if (owner.ai[2] >= 99)
-                {
-                    projectile.Kill();
-                    return;
+                    Projectile.NewProjectile(projectile.Center, Facing * 15, ModContent.ProjectileType<SuperStarHostile>(), projectile.damage, 0, default);
                 }
             }
+            else
+            {
+                projectile.Kill();
+                return;
+            }
+
             if (owner.ai[1] > 5)
             {
                 projectile.Kill();
+                return;
             }
 
         }

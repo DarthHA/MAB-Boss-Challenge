@@ -8,6 +8,10 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.CrimsonPlayer
 {
     public class BloodLustClusterThown : ModProjectile
     {
+        public override bool Autoload(ref string name)
+        {
+            return false;
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("血腥屠刀");

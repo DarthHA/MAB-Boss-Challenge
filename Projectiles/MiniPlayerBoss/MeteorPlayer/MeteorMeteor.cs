@@ -38,6 +38,10 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer
                 projectile.frame = Main.rand.Next(3);
             }
         }
+        public override void PostAI()
+        {
+            projectile.tileCollide = false;
+        }
         public override void ModifyHitPlayer(Player target, ref int damage, ref bool crit)
         {
             damage = 80 / 4;
@@ -88,9 +92,23 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer
         {
             target.AddBuff(BuffID.BrokenArmor, 120);
             target.AddBuff(BuffID.OnFire, 120);
+            if (MABWorld.DownedMeteorPlayerEX && NPC.downedMoonlord)
+            {
+                target.AddBuff(BuffID.Dazed, 120);
+                target.AddBuff(BuffID.WitheredArmor, 120);
+            }
             projectile.timeLeft = 0;
         }
-
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            target.AddBuff(BuffID.BrokenArmor, 120);
+            target.AddBuff(BuffID.OnFire, 120);
+            if (MABWorld.DownedMeteorPlayerEX && NPC.downedMoonlord)
+            {
+                target.AddBuff(BuffID.Dazed, 120);
+                target.AddBuff(BuffID.WitheredArmor, 120);
+            }
+        }
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.White;
@@ -98,6 +116,7 @@ namespace MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer
 
         public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
         {
+
             Texture2D texture2D13 = Main.projectileTexture[projectile.type];
             int num156 = Main.projectileTexture[projectile.type].Height / Main.projFrames[projectile.type]; //ypos of lower right corner of sprite to draw
             int y3 = num156 * projectile.frame; //ypos of upper left corner of sprite to draw
