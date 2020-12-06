@@ -1,5 +1,6 @@
 using Terraria;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 
@@ -9,7 +10,8 @@ namespace MABBossChallenge.Items
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("歼星锤");
+            DisplayName.SetDefault("Test");
+            DisplayName.AddTranslation(GameCulture.Chinese, "永恒星神");
             Tooltip.SetDefault("一把足以毁灭世界的神器");
         }
 

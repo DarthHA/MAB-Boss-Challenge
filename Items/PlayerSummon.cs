@@ -42,6 +42,10 @@ namespace MABBossChallenge.Items
         }
         public override bool CanUseItem(Player player)
         {
+            if (!MABWorld.DownedSolarPlayer || !MABWorld.DownedVortexPlayer || !MABWorld.DownedNebulaPlayer || !MABWorld.DownedStardustPlayer)
+            {
+                return false;
+            }
             return (!NPC.AnyNPCs(ModContent.NPCType<SolarFighterBoss>()) && !NPC.AnyNPCs(ModContent.NPCType<VortexRangerBoss>()) && !NPC.AnyNPCs(ModContent.NPCType<NebulaMageBoss>()) && !NPC.AnyNPCs(ModContent.NPCType<StardustSummonerBoss>()));
         }
 

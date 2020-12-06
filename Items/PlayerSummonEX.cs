@@ -14,8 +14,8 @@ namespace MABBossChallenge.Items
         {
             DisplayName.SetDefault("Celestial Rune MK2 EX");
             DisplayName.AddTranslation(GameCulture.Chinese, "天界符文MK2 EX");
-            Tooltip.SetDefault("Summon the four awakened defenders at the same time\nAlthough by now there are only three lol\nNot consumed");
-            Tooltip.AddTranslation(GameCulture.Chinese, "直接召唤觉醒的月下四柱男\n尽管目前只有三个（笑）\n该物品不消耗");
+            Tooltip.SetDefault("Summon the four awakened defenders at the same time\nAlthough by now there are only three lol\nNot consumed\nAyayaya~~~");
+            Tooltip.AddTranslation(GameCulture.Chinese, "直接召唤觉醒的月下四柱男\n尽管目前只有三个（笑）\n该物品不消耗\n阿姨压一压~~~");
             ItemID.Sets.SortingPriorityBossSpawns[item.type] = 13;
             TranslationUtils.AddTranslation("AwakenedDefendersSpawn", "Awakened defenders have awoken.","觉醒守护者们已苏醒");
         }
