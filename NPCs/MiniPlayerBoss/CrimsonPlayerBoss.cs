@@ -46,10 +46,15 @@ namespace MABBossChallenge.NPCs.MiniPlayerBoss
             NPCID.Sets.TrailCacheLength[npc.type] = 6;
             NPCID.Sets.TrailingMode[npc.type] = 1;
             music = mod.GetSoundSlot(SoundType.Music, "Sounds/Music/The First Guardian");
-
-
             npc.dontTakeDamage = true;
             npc.value = 20000;
+
+            if (!Main.expertMode)
+            {
+                npc.lifeMax = (int)(npc.lifeMax * 0.75f);
+                npc.damage = (int)(npc.damage * 0.75f);
+                npc.life = npc.lifeMax;
+            }
         }
         public override void ScaleExpertStats(int numPlayers, float bossLifeScale)
         {
@@ -81,7 +86,7 @@ namespace MABBossChallenge.NPCs.MiniPlayerBoss
 
                 if (!DetectBorder())
                 {
-                    npc.velocity = Vector2.Zero;
+                    npc.velocity.X = 0;
                     npc.position.X = Terraria.Utils.Clamp(npc.Center.X, SpawnPos.X - 780, SpawnPos.X + 780) - npc.width / 2;
                 }
             }
