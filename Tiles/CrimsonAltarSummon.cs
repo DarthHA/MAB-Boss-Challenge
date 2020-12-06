@@ -100,6 +100,13 @@ namespace MABBossChallenge.Tiles
                     Main.npc[npcmtp].damage = 90;
                     Main.npc[npcmtp].defense = 20;
                     Main.npc[npcmtp].localAI[2] = 1;
+
+                    if (!Main.expertMode)
+                    {
+                        Main.npc[npcmtp].lifeMax = (int)(Main.npc[npcmtp].lifeMax * 0.75f);
+                        Main.npc[npcmtp].damage = (int)(Main.npc[npcmtp].damage * 0.75f);
+                        Main.npc[npcmtp].life = Main.npc[npcmtp].lifeMax;
+                    }
                     Main.NewText(Language.GetTextValue("Announcement.HasAwoken", Main.npc[npcmtp].TypeName), 175, 75, byte.MaxValue, false);
                     npcmtp = NPC.NewNPC(SummonX * 16, SummonY * 16, ModContent.NPCType<CrimsonPlayerBoss>());
                     Main.npc[npcmtp].lifeMax = 48000;
@@ -107,6 +114,13 @@ namespace MABBossChallenge.Tiles
                     Main.npc[npcmtp].damage = 100;
                     Main.npc[npcmtp].defense = 40;
                     Main.npc[npcmtp].localAI[2] = 1;
+
+                    if (!Main.expertMode)
+                    {
+                        Main.npc[npcmtp].lifeMax = (int)(Main.npc[npcmtp].lifeMax * 0.75f);
+                        Main.npc[npcmtp].damage = (int)(Main.npc[npcmtp].damage * 0.75f);
+                        Main.npc[npcmtp].life = Main.npc[npcmtp].lifeMax;
+                    }
                     Main.NewText(Language.GetTextValue("Announcement.HasAwoken", Main.npc[npcmtp].TypeName), 175, 75, byte.MaxValue, false);
                     Main.PlaySound(SoundID.Roar, Main.LocalPlayer.Center, 0);
                     Main.LocalPlayer.GetModPlayer<SMPlayer>().Set(new Vector2(SummonX * 16, SummonY * 16), TranslationUtils.GetTranslation("GuardianBro"), TranslationUtils.GetTranslation("GuardianBroDescription"));

@@ -1,4 +1,5 @@
 ﻿using MABBossChallenge.NPCs.MiniPlayerBoss;
+using MABBossChallenge.NPCs.PlayerBoss;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -7,9 +8,13 @@ using Terraria.ModLoader;
 
 namespace MABBossChallenge.Utils
 {
+
     public static class NPCUtils
     {
-
+        /// <summary>
+        /// 世界里是否有Boss存活
+        /// </summary>
+        /// <returns></returns>
         public static bool AnyBosses()
         {
             foreach (NPC npc in Main.npc)
@@ -22,12 +27,13 @@ namespace MABBossChallenge.Utils
             return false;
         }
 
-        public static bool InTemple(Vector2 Pos)
-        {
-            return Main.tile[(int)(Pos.X / 16), (int)(Pos.Y / 16)] != null &&
-                        Main.tile[(int)(Pos.X / 16), (int)(Pos.Y / 16)].wall == WallID.LihzahrdBrickUnsafe;
-        }
 
+
+        /// <summary>
+        /// 是否存在指定类型射弹
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static bool AnyProj(int type)
         {
             foreach (Projectile proj in Main.projectile)
@@ -40,23 +46,37 @@ namespace MABBossChallenge.Utils
             return false;
         }
 
-        public static bool AnyProj(int type, int owner)
+
+
+
+        /// <summary>
+        /// 判断该世界坐标是否在指定墙背后，type为空时判断是否在墙后
+        /// </summary>
+        /// <param name="Pos"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool InWall(Vector2 Pos, int? type = null)
         {
-            foreach (Projectile proj in Main.projectile)
+            if (type == null)
             {
-                if (proj.active && proj.type == type && proj.owner == owner)
-                {
-                    return true;
-                }
+                return Main.tile[(int)(Pos.X / 16), (int)(Pos.Y / 16)] != null;
             }
-            return false;
-        }
-        public static bool InWall(Vector2 Pos, int type)
-        {
-            return Main.tile[(int)(Pos.X / 16), (int)(Pos.Y / 16)] != null &&
-                        Main.tile[(int)(Pos.X / 16), (int)(Pos.Y / 16)].wall == type;
+            else
+            {
+                return Main.tile[(int)(Pos.X / 16), (int)(Pos.Y / 16)] != null &&
+                            Main.tile[(int)(Pos.X / 16), (int)(Pos.Y / 16)].wall == (int)type;
+            }
         }
 
+
+        /// <summary>
+        /// 判断该世界坐标是否与指定物块发生碰撞
+        /// </summary>
+        /// <param name="Position"></param>
+        /// <param name="Width"></param>
+        /// <param name="Height"></param>
+        /// <param name="TileType"></param>
+        /// <returns></returns>
         public static bool TileCollision(Vector2 Position, int Width, int Height, int TileType)
         {
             int num = (int)(Position.X / 16f) - 1;
@@ -92,31 +112,7 @@ namespace MABBossChallenge.Utils
             return false;
         }
 
-        public static float SinEX(float x)
-        {
-            while (x >= MathHelper.TwoPi || x < 0)
-            {
-                if (x >= MathHelper.TwoPi) x -= MathHelper.TwoPi;
-                if (x < 0) x += MathHelper.TwoPi;
-            }
-            if (x < MathHelper.Pi / 2)
-            {
-                return x / (MathHelper.Pi / 2);
-            }
-            if (x >= MathHelper.Pi / 2 && x < MathHelper.Pi)
-            {
-                return (MathHelper.Pi - x) / (MathHelper.Pi / 2);
-            }
-            if (x >= MathHelper.Pi && x < MathHelper.Pi / 2 * 3)
-            {
-                return (MathHelper.Pi - x) / (MathHelper.Pi / 2);
-            }
-            if (x >= MathHelper.Pi / 2 * 3)
-            {
-                return (x - MathHelper.TwoPi) / (MathHelper.Pi / 2);
-            }
-            return -114514;
-        }
+        
 
         public static Vector2 Rot(Vector2 vec, float r)
         {
@@ -146,82 +142,29 @@ namespace MABBossChallenge.Utils
             return false;
         }
 
-        public static void Movement(NPC npc, Vector2 targetPos, float speedModifier, bool fastX = true, float XLimit = 24, float YLimit = 24)
+        public static bool AnyPillarBosses()
         {
-            if (npc.Center.X < targetPos.X)
-            {
-                npc.velocity.X += speedModifier;
-                if (npc.velocity.X < 0)
-                    npc.velocity.X += speedModifier * (fastX ? 2 : 1);
-            }
-            else
-            {
-                npc.velocity.X -= speedModifier;
-                if (npc.velocity.X > 0)
-                    npc.velocity.X -= speedModifier * (fastX ? 2 : 1);
-            }
-            if (npc.Center.Y < targetPos.Y)
-            {
-                npc.velocity.Y += speedModifier;
-                if (npc.velocity.Y < 0)
-                    npc.velocity.Y += speedModifier * 2;
-            }
-            else
-            {
-                npc.velocity.Y -= speedModifier;
-                if (npc.velocity.Y > 0)
-                    npc.velocity.Y -= speedModifier * 2;
-            }
-            if (Math.Abs(npc.velocity.X) > XLimit)
-                npc.velocity.X = XLimit * Math.Sign(npc.velocity.X);
-            if (Math.Abs(npc.velocity.Y) > YLimit)
-                npc.velocity.Y = YLimit * Math.Sign(npc.velocity.Y);
-
-
+            return NPC.AnyNPCs(ModContent.NPCType<SolarFighterBoss>()) || NPC.AnyNPCs(ModContent.NPCType<VortexRangerBoss>()) ||
+    NPC.AnyNPCs(ModContent.NPCType<NebulaMageBoss>()) || NPC.AnyNPCs(ModContent.NPCType<StardustSummonerBoss>());
         }
 
 
-        public static void MovementX(NPC npc, float TargetX, float speedModifier, bool fastX = true, float XLimit = 24)
+        public static bool AnyThisModBosses()
         {
-            if (npc.Center.X < TargetX)
+            foreach(NPC npc in Main.npc)
             {
-                npc.velocity.X += speedModifier;
-                if (npc.velocity.X < 0)
-                    npc.velocity.X += speedModifier * (fastX ? 2 : 1);
-            }
-            else
-            {
-                npc.velocity.X -= speedModifier;
-                if (npc.velocity.X > 0)
-                    npc.velocity.X -= speedModifier * (fastX ? 2 : 1);
-            }
-
-            if (Math.Abs(npc.velocity.X) > XLimit)
-                npc.velocity.X = XLimit * Math.Sign(npc.velocity.X);
-
-        }
-
-        public static int HomeOnTarget(Projectile projectile, int Range)
-        {
-
-            float homingMaximumRangeInPixels = Range;
-            int selectedTarget = -1;
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                NPC n = Main.npc[i];
-                if (n.CanBeChasedBy(projectile))
+                if (npc.active)
                 {
-                    float distance = projectile.Distance(n.Center);
-                    if (distance <= homingMaximumRangeInPixels &&
-                        (
-                            selectedTarget == -1 || //there is no selected target
-                            projectile.Distance(Main.npc[selectedTarget].Center) > distance) //or we are closer to this target than the already selected target
-                    )
-                        selectedTarget = i;
+                    if (npc.modNPC != null)
+                    {
+                        if (npc.modNPC.mod == MABBossChallenge.Instance)
+                        {
+                            return true;
+                        }
+                    }
                 }
             }
-
-            return selectedTarget;
+            return false;
         }
 
     }

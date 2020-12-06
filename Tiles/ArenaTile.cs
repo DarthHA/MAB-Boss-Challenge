@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace MABBossChallenge.Tiles
@@ -20,6 +21,7 @@ namespace MABBossChallenge.Tiles
 
             ModTranslation name = CreateMapEntryName();
             name.SetDefault("Arena");
+            name.AddTranslation(GameCulture.Chinese, "战场");
             AddMapEntry(Color.DarkGray, name);
 
             dustType = 84;
@@ -31,11 +33,11 @@ namespace MABBossChallenge.Tiles
         }
         public override bool CanKillTile(int i, int j, ref bool blockDamaged)
         {
-            return MABWorld.DownedPreEvilFighter;
+            return MABWorld.DownedPreEvilFighter || MABWorld.DownedPreEvilFighter2;
         }
         public override bool CanExplode(int i, int j)
         {
-            return MABWorld.DownedPreEvilFighter;
+            return MABWorld.DownedPreEvilFighter || MABWorld.DownedPreEvilFighter2;
         }
     }
 }
