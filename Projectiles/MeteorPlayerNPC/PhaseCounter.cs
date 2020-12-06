@@ -57,7 +57,12 @@ namespace MABBossChallenge.Projectiles.MeteorPlayerNPC
         }
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
+            if (MABWorld.DownedMeteorPlayerEX && NPC.downedMoonlord)
+            {
+                damage *= 3;
+            }
             damage += target.defense / 2;
+
         }
 
     }
