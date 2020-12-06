@@ -15,7 +15,7 @@ namespace MABBossChallenge.NPCs
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Meteor Guardian");
-            DisplayName.AddTranslation(GameCulture.Chinese, "陨石护卫");
+            DisplayName.AddTranslation(GameCulture.Chinese, "陨石守卫");
             Main.npcFrameCount[npc.type] = 20;
         }
         public override void SetDefaults()
@@ -119,8 +119,12 @@ namespace MABBossChallenge.NPCs
                 }
             }
 
+            if (npc.life < npc.lifeMax * 0.9f)
+            {
+                npc.Transform(ModContent.NPCType<MeteorPlayerBoss>());
+            }
 
-            if (Main.rand.Next(6) == 1)
+            if (npc.velocity.Length() > 3 && Main.rand.Next(3) > 0)
             {
                 Dust dust = Main.dust[Dust.NewDust(npc.position, npc.width, npc.height, 6, 0f, 0f, 100, default, 2f)];
                 dust.noGravity = true;
@@ -171,11 +175,15 @@ namespace MABBossChallenge.NPCs
             return "";
         }
         */
+
+        public override string GetChat()
+        {
+            return "... ...";
+        }
         public override void NPCLoot()
         {
-            MABWorld.DownedPreEvilFighter = true;
             int protmp = Projectile.NewProjectile(npc.Center, (Main.rand.NextFloat() * MathHelper.TwoPi).ToRotationVector2() * 5, ProjectileID.Tombstone, 0, 0, Main.myPlayer);
-            Main.projectile[protmp].miscText = "陨石守护者 被击败了，凶手是" + Main.LocalPlayer.name + "。";
+            //Main.projectile[protmp].miscText = "陨石守护者 被击败了，凶手是" + Main.LocalPlayer.name + "。";
         }
         private void DP(SpriteBatch spritebatch, Vector2 Pos, Color a)
         {

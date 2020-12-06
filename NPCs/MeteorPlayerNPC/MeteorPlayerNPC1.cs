@@ -19,12 +19,12 @@ namespace MABBossChallenge.NPCs
 	public class MeteorPlayerNPC1 : ModNPC
 	{
 		public override string Texture => "MABBossChallenge/NPCs/MeteorPlayerNPC/MeteorPlayerNPC1";
-
+		
 		//public override string[] AltTextures => new[] { "ExampleMod/NPCs/ExamplePerson_Alt_1" };
 		public bool Challenge = false;
 		public override bool Autoload(ref string name)
 		{
-			name = "陨石守卫";
+			name = "Meteor Guardian";
 			return mod.Properties.Autoload;
 		}
 
@@ -77,6 +77,14 @@ namespace MABBossChallenge.NPCs
 					npc.damage = 30;
 				}
 			}
+
+			if (!Main.expertMode)
+			{
+				npc.lifeMax = (int)(npc.lifeMax * 0.75f);
+				npc.damage = (int)(npc.damage * 0.75f);
+				npc.life = npc.lifeMax;
+			}
+
 			npc.HitSound = SoundID.NPCHit4;
 			npc.DeathSound = SoundID.NPCDeath4;
 			npc.knockBackResist = 0.5f;
@@ -111,8 +119,15 @@ namespace MABBossChallenge.NPCs
 
 		public override bool PreAI()
 		{
+			if (Math.Abs(npc.velocity.X) > 0.3f) 
+			{
+				Dust dust = Main.dust[Dust.NewDust(npc.position, npc.width, npc.height, 6, 0f, 0f, 100, default, 2f)];
+				dust.noGravity = true;
+				dust.scale = 1.7f;
+				dust.fadeIn = 0.5f;
+			}
 			//Main.NewText(NPCID.Sets.AttackAverageChance[npc.type]);
-			if(!MABBossChallenge.mabconfig.NPCAttackBoss && Utils.NPCUtils.AnyBosses())
+			if (!MABBossChallenge.mabconfig.NPCAttackBoss && Utils.NPCUtils.AnyBosses())
 			{
 				NPCID.Sets.AttackAverageChance[npc.type] = 0;
 				npc.velocity.X *= 0.8f;

@@ -1,8 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using MABBossChallenge.NPCs.MiniPlayerBoss;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace MABBossChallenge.NPCs
@@ -12,7 +14,8 @@ namespace MABBossChallenge.NPCs
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("陨星头");
+            DisplayName.SetDefault("Meteor Head");
+            DisplayName.AddTranslation(GameCulture.Chinese, "陨星头");
             Main.npcFrameCount[npc.type] = 2;
         }
 
@@ -63,7 +66,10 @@ namespace MABBossChallenge.NPCs
                 npc.velocity.Y -= 0.1f;
                 return;
             }
-
+            if (!NPC.AnyNPCs(ModContent.NPCType<MeteorPlayerBoss>()))
+            {
+                npc.active = false;
+            }
             Player player = Main.player[npc.target];
             npc.direction = Math.Sign(player.Center.X - npc.Center.X);
             Vector2 Facing = Vector2.Normalize(player.Center - npc.Center);

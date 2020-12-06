@@ -10,6 +10,8 @@ using MABBossChallenge.Projectiles.MeteorPlayerNPC;
 using Terraria.Utilities;
 using System.IO;
 using Terraria.Localization;
+using MABBossChallenge.Projectiles.MiniPlayerBoss.MeteorPlayer;
+using MABBossChallenge.Projectiles.PlayerBoss;
 
 namespace MABBossChallenge.NPCs.MeteorPlayerNPC
 {
@@ -23,6 +25,8 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
         {
             DisplayName.SetDefault("Meteor Guardian");
             DisplayName.AddTranslation(GameCulture.Chinese, "陨石守卫");
+            NPCID.Sets.TrailCacheLength[npc.type] = 6;
+            NPCID.Sets.TrailingMode[npc.type] = 1;
 
             TranslationUtils.AddTranslation("MeteorGuardianChat10", "THE BEHAVIOR OF THOSE MONSTERS REALLY ANGERED ME, SO I MUST FIGHT!", "那些怪物的行为激怒了我，所以我必须迎战！");
             TranslationUtils.AddTranslation("MeteorGuardianChat11", "COME ON!", "来吧！");
@@ -63,13 +67,19 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
                     npc.damage = 800;
                 }
             }
-            
+
+            if (!Main.expertMode)
+            {
+                npc.lifeMax = (int)(npc.lifeMax * 0.75f);
+                npc.damage = (int)(npc.damage * 0.75f);
+                npc.life = npc.lifeMax;
+            }
+
             for (int i = 0; i < npc.buffImmune.Length; i++)
             {
                 npc.buffImmune[i] = true;
             }
-            NPCID.Sets.TrailCacheLength[npc.type] = 6;
-            NPCID.Sets.TrailingMode[npc.type] = 1;
+
             npc.value = 0;
             
         }
@@ -89,14 +99,7 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
                 }
             }
 
-            if (!NPC.AnyNPCs(ModContent.NPCType<MeteorHeadFriendly>()) && NPC.downedMoonlord)
-            {
-                for (float i = 0; i < MathHelper.TwoPi; i += MathHelper.TwoPi / 3)
-                {
-                    int npct = NPC.NewNPC((int)npc.Center.X, (int)npc.Center.Y, ModContent.NPCType<MeteorHeadFriendly>());
-                    Main.npc[npct].velocity = i.ToRotationVector2() * 10;
-                }
-            }
+
 
             if (MABBossChallenge.mabconfig.NPCAttackBGM)
             {
@@ -146,20 +149,35 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
 
             npc.spriteDirection = npc.direction = Math.Sign(Main.npc[(int)npc.ai[3]].Center.X - npc.Center.X);
             NPC target = Main.npc[(int)npc.ai[3]];
-
-            if (Main.rand.Next(2) == 1)
+            if (npc.velocity.Length() > 2)
             {
                 Dust dust = Main.dust[Dust.NewDust(npc.position, npc.width, npc.height, 6, 0f, 0f, 100, default, 2f)];
                 dust.noGravity = true;
                 dust.scale = 1.7f;
                 dust.fadeIn = 0.5f;
-
-                dust = Main.dust[Dust.NewDust(npc.position + new Vector2(0, npc.height), npc.width, 10, 6, 0f, 0f, 100, default, 2f)];
+            }
+            if (Main.rand.Next(2) == 0)
+            {
+                Dust dust = Main.dust[Dust.NewDust(npc.position + new Vector2(0, npc.height), npc.width, 10, 6, 0f, 0f, 100, default, 2f)];
                 dust.noGravity = true;
                 dust.scale = 1.7f;
                 dust.fadeIn = 0.5f;
                 dust.velocity.Y += 5f;
             }
+
+            if (NPC.downedMoonlord)
+            {
+                if ((target.life > 10000 || TargetCount() >= 10) && !NPC.AnyNPCs(ModContent.NPCType<MeteorHeadFriendly>()))
+                {
+                    for (float i = 0; i < MathHelper.TwoPi; i += MathHelper.TwoPi / 3)
+                    {
+                        int npct = NPC.NewNPC((int)npc.Center.X, (int)npc.Center.Y, ModContent.NPCType<MeteorHeadFriendly>());
+                        Main.npc[npct].velocity = i.ToRotationVector2() * 10;
+                    }
+                }
+            }
+
+
             if (AI0 == 0)
             {
                 AI0 = 1;
@@ -187,15 +205,30 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
                             {
                                 AI2++;
                                 npc.velocity *= 0.8f;
-
-                                if (AI2 % 12 == 2 && AI2 < 60 && AI2 > 12)
+                                if (NPC.downedMoonlord && MABWorld.DownedMeteorPlayerEX)
                                 {
-                                    Vector2 Facing = Vector2.Normalize(target.Center - npc.Center);
-                                    Main.PlaySound(SoundID.Item12, npc.Center);
-                                    int protmp = Projectile.NewProjectile(npc.Center, Facing * 25, ProjectileID.GreenLaser, npc.damage, 1, Main.myPlayer);
-                                    Main.projectile[protmp].tileCollide = false;
+                                    if (AI2 % 6 == 2 && AI2 < 60 && AI2 > 12)
+                                    {
+                                        Vector2 Facing = Vector2.Normalize(target.Center - npc.Center + target.velocity / 2);
+                                        Main.PlaySound(SoundID.Item12, npc.Center);
+                                        int protmp = Projectile.NewProjectile(npc.Center, Facing * 25, ProjectileID.PurpleLaser, npc.damage, 1, Main.myPlayer);
+                                        Main.projectile[protmp].tileCollide = false;
+                                        Main.projectile[protmp].magic = false;
+                                        Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
+                                    }
                                 }
-
+                                else
+                                {
+                                    if (AI2 % 12 == 2 && AI2 < 60 && AI2 > 12)
+                                    {
+                                        Vector2 Facing = Vector2.Normalize(target.Center - npc.Center);
+                                        Main.PlaySound(SoundID.Item12, npc.Center);
+                                        int protmp = Projectile.NewProjectile(npc.Center, Facing * 25, ProjectileID.GreenLaser, npc.damage, 1, Main.myPlayer);
+                                        Main.projectile[protmp].tileCollide = false;
+                                        Main.projectile[protmp].magic = false;
+                                        Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
+                                    }
+                                }
                                 
                                 if (AI2 > 100)
                                 {
@@ -250,18 +283,38 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
                             if (AI2 >= 80)
                             {
                                 if (AI2 % 40 == 0)
-                                {
-                                    npc.velocity = Vector2.Normalize(target.Center - npc.Center) * 40;
+                                { 
+                                    npc.velocity = Vector2.Normalize(target.Center - npc.Center) * 5;
+                                    if(MABWorld.DownedMeteorPlayerEX && NPC.downedMoonlord)
+                                    {
+                                        npc.velocity = Vector2.Normalize(target.Center - npc.Center + target.velocity / 3 * 2) * 5;
+                                    }
                                     Main.PlaySound(SoundID.Item15, target.Center);
                                 }
-                                if (AI2 % 40 > 0)
+                                if (AI2 % 40 > 0 && AI2 % 40 < 10) 
+                                {
+                                    if (NPC.downedMoonlord && MABWorld.DownedMeteorPlayerEX) 
+                                    {
+                                        npc.velocity *= 1.3f;
+                                    }
+                                    else
+                                    {
+                                        npc.velocity *= 1.26f;
+                                    }
+                                }
+                                if (AI2 % 40 == 10 && MABWorld.DownedMeteorPlayerEX && NPC.downedMoonlord)
+                                {
+                                    Projectile.NewProjectile(npc.Center, npc.velocity / 1000, ModContent.ProjectileType<HotLaserFriendly>(), npc.damage / 4, 0, Main.myPlayer);
+                                }
+                                if (AI2 % 40 >= 10 && AI2 % 40 < 35)
                                 {
                                     npc.velocity *= 0.92f;
-                                }
-                                if (AI2 % 40 < 35)
-                                {
                                     ChangeRot(npc.Center + npc.velocity);
                                     npc.direction = npc.spriteDirection = Math.Sign(npc.velocity.X);
+                                }
+                                if (AI2 % 40 > 35)
+                                {
+                                    npc.velocity *= 0.96f;
                                 }
                                 if (AI2 > 39 + 40 * 5 + 80)
                                 {
@@ -306,7 +359,14 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
                                 if (AI2 == 40)
                                 {
                                     Vector2 Facing = Vector2.Normalize(target.Center - npc.Center);
-                                    Projectile.NewProjectile(npc.Center, Facing * 15, ModContent.ProjectileType<EZStarFriendlyS>(), (int)(npc.damage * 1.2), 0, default);
+                                    if (MABWorld.DownedMeteorPlayerEX && NPC.downedMoonlord)
+                                    {
+                                        Projectile.NewProjectile(npc.Center, Facing * 15, ModContent.ProjectileType<SuperStarFriendly>(), npc.damage, 0, Main.myPlayer);
+                                    }
+                                    else
+                                    {
+                                        Projectile.NewProjectile(npc.Center, Facing * 15, ModContent.ProjectileType<EZStarFriendlyS>(), (int)(npc.damage * 1.2f), 0, Main.myPlayer);
+                                    }
                                 }
 
                                 if (AI2 > 100)
@@ -346,10 +406,12 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
                                     type.Add(ProjectileID.Meteor1);
                                     type.Add(ProjectileID.Meteor2);
                                     type.Add(ProjectileID.Meteor3);
-                                    Vector2 TargetPos = target.Center + (Main.rand.NextFloat() * MathHelper.TwoPi).ToRotationVector2() * Main.rand.Next(10);
+                                    Vector2 TargetPos = target.Center + npc.velocity * 15f + (Main.rand.NextFloat() * MathHelper.TwoPi).ToRotationVector2() * Main.rand.Next(10);
                                     Vector2 Pos = target.Center + new Vector2(Main.rand.Next(-80, 80), -1500);
-                                    int protmp = Projectile.NewProjectile(Pos, Vector2.Normalize(TargetPos - Pos) * 20, type, npc.damage / 2, 0f, Main.myPlayer, 0f, Main.rand.NextFloat(1f, 1.5f));
+                                    int protmp = Projectile.NewProjectile(Pos, Vector2.Normalize(TargetPos - Pos) * 20, type, npc.damage, 0f, Main.myPlayer, 0f, Main.rand.NextFloat(1f, 1.5f));
                                     Main.projectile[protmp].tileCollide = false;
+                                    Main.projectile[protmp].magic = false;
+                                    Main.projectile[protmp].GetGlobalProjectile<PlayerBossProj>().SpecialProj = true;
                                 }
                             }
                             if (AI2 > 300)
@@ -450,7 +512,14 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
             spriteBatch.Draw(tex, npc.Center - Main.screenPosition, null, drawColor, 0, tex.Size() / 2, npc.scale, SP, 0);
             if (AI1 == 0)
             {
-                DrawWeapon(spriteBatch, ItemID.SpaceGun, drawColor);
+                if (NPC.downedMoonlord && MABWorld.DownedMeteorPlayerEX)
+                {
+                    DrawWeapon(spriteBatch, ItemID.LaserRifle, drawColor);
+                }
+                else
+                {
+                    DrawWeapon(spriteBatch, ItemID.SpaceGun, drawColor);
+                }
             }
             if (AI1 == 2)
             {
@@ -458,7 +527,24 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
             }
             if (AI1 == 4)
             {
-                DrawWeapon(spriteBatch, ItemID.StarCannon, drawColor);
+                if (NPC.downedMoonlord && MABWorld.DownedMeteorPlayerEX)
+                {
+                    Texture2D Tex = Main.projectileTexture[ModContent.ProjectileType<SuperEZShooterHostile>()];
+
+                    if (SP == SpriteEffects.None)
+                    {
+                        spriteBatch.Draw(Tex, npc.Center - Main.screenPosition, null, drawColor, npc.rotation - MathHelper.Pi / 2, new Vector2(0, Tex.Height / 2), npc.scale, SP, 0);
+                    }
+                    if (SP == SpriteEffects.FlipHorizontally)
+                    {
+                        spriteBatch.Draw(Tex, npc.Center - Main.screenPosition, null, drawColor, MathHelper.Pi / 2 * 3 + npc.rotation, new Vector2(Tex.Width, Tex.Height / 2), npc.scale, SP, 0);
+                    }
+
+                }
+                else
+                {
+                    DrawWeapon(spriteBatch, ItemID.StarCannon, drawColor);
+                }
             }
             if (AI1 == 6)
             {
@@ -491,6 +577,31 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
         public override void BossHeadSpriteEffects(ref SpriteEffects spriteEffects)
         {
             spriteEffects = (npc.direction > 0) ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+        }
+
+        public int TargetCount()
+        {
+            float homingMaximumRangeInPixels = NPCID.Sets.DangerDetectRange[ModContent.NPCType<MeteorPlayerNPC1>()] + 100;
+            int count = 0;
+
+            foreach (NPC target in Main.npc)
+            {
+                if (MABBossChallenge.mabconfig.NPCAttackBoss || target.damage > 0)
+                {
+                    if (target.active && !target.friendly && !target.immortal && !target.dontTakeDamage && (target.type != NPCID.SkeletonMerchant || !NPCID.Sets.Skeletons.Contains(target.netID)))
+                    {
+                        if (target.Distance(SpawnPos) <= homingMaximumRangeInPixels)
+                        {
+                            if (!target.boss || MABBossChallenge.mabconfig.NPCAttackBoss)
+                            {
+                                count++;
+                            }
+                        }
+                    }
+                }
+
+            }
+            return count;
         }
 
         public int HomeOnTarget()
@@ -534,18 +645,23 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
             Vector2 Facing = Vector2.Normalize(TargetPos - npc.Center);
             if (npc.spriteDirection > 0)
             {
-                npc.rotation = (float)Math.Atan2(Facing.Y, Facing.X) + MathHelper.Pi / 2;
+                Vector2 TargetRot = ((float)Math.Atan2(Facing.Y, Facing.X) + MathHelper.Pi / 2).ToRotationVector2();
+                npc.rotation = (npc.rotation.ToRotationVector2() + TargetRot * 0.2f).ToRotation();
             }
             else
             {
-                npc.rotation = (float)Math.Atan2(Facing.Y, Facing.X) - MathHelper.Pi / 2;
+                Vector2 TargetRot = ((float)Math.Atan2(Facing.Y, Facing.X) - MathHelper.Pi / 2).ToRotationVector2();
+                npc.rotation = (npc.rotation.ToRotationVector2() + TargetRot * 0.2f).ToRotation();
             }
             if (AI1 == 2 || AI1 == 6) 
             {
-                npc.rotation = (float)Math.Atan2(Facing.Y, Facing.X);
+                Vector2 TargetRot = Facing.ToRotation().ToRotationVector2();
+                npc.rotation = (npc.rotation.ToRotationVector2() + TargetRot * 4f).ToRotation();
             }
             
         }
+
+
 
         public override void SendExtraAI(BinaryWriter writer)
         {
@@ -595,7 +711,7 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
 
         public override string TownNPCName()
         {
-            return "陨石守卫";
+            return TranslationUtils.GetTranslation("MeteorGuardianNPCName");
         }
 
 

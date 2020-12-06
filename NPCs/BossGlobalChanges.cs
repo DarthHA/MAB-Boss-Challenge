@@ -182,7 +182,6 @@ namespace MABBossChallenge.NPCs
                     {
                         return MABWorld.DownedMeteorPlayer;
                     }
-                    break;
                 default:
                     break;
             }

@@ -23,7 +23,7 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
             npc.friendly = true;
             npc.width = 24;
             npc.height = 24;
-            npc.damage = 1000;
+            npc.damage = 2000;
             npc.lifeMax = 10000;
             npc.HitSound = SoundID.NPCHit3;
             npc.DeathSound = SoundID.NPCDeath3;
@@ -51,8 +51,9 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
             {
                 npc.life = 0;
                 npc.HitEffect();
+                return;
             }
-            
+           
             if (npc.ai[3] < 0 || npc.ai[3] > 200)
             {
                 npc.ai[3] = HomeOnTarget();
@@ -72,6 +73,7 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
                 {
                     npc.life = 0;
                     npc.HitEffect();
+                    return;
                 }
             }
 
@@ -97,6 +99,7 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
                             n.AddBuff(BuffID.OnFire, 600);
                             npc.ai[2] = 2;
                             npc.ai[1] = 25;
+                            npc.localAI[0]++;
                             break;
                         }
                     }
@@ -147,7 +150,8 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
         }
         public override void HitEffect(int hitDirection, double damage)
         {
-            if (npc.life > 0)
+            /*
+            if (npc.life > 0 && npc.localAI[0] > 0)
             {
                 int num687 = 0;
                 while (num687 < damage / npc.lifeMax * 100.0)
@@ -180,7 +184,10 @@ namespace MABBossChallenge.NPCs.MeteorPlayerNPC
                 dust.velocity *= 6f;
                 Main.dust[num693].noGravity = true;
             }
-        }
+            
+            */
+        }    
+        
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.White;
