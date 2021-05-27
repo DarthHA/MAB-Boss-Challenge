@@ -1,16 +1,15 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using Terraria;
 using Terraria.Graphics;
 using Terraria.Graphics.Effects;
 using Terraria.Utilities;
-using Terraria.ModLoader;
-using Terraria;
 
 namespace MABBossChallenge.Sky
 {
-	// Token: 0x02000420 RID: 1056
-	public class StardustBossSky : CustomSky
+    // Token: 0x02000420 RID: 1056
+    public class StardustBossSky : CustomSky
 	{
 		// Token: 0x060024D2 RID: 9426 RVA: 0x0047FFC4 File Offset: 0x0047E1C4
 		public override void OnLoad()
