@@ -1,6 +1,7 @@
 ﻿using MABBossChallenge.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
@@ -8,7 +9,7 @@ using Terraria.ModLoader;
 
 namespace MABBossChallenge.Projectiles.EchDestroyer
 {
-    public class WarpBolt: ModProjectile
+    public class WarpBolt2 : ModProjectile
     {
         public override void SetStaticDefaults()
         {
@@ -33,9 +34,9 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
 
         public override void AI()
         {
-            if (projectile.localAI[0] == 0)
+            projectile.localAI[0]++;
+            if (projectile.localAI[0] == 1)
             {
-                projectile.localAI[0]++;
                 Main.PlaySound(SoundID.Item115, projectile.Center);
             }
             if (projectile.alpha > 50)
@@ -71,6 +72,15 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
         {
+            if (projectile.localAI[0] > 0 && projectile.localAI[0] < 30)
+            {
+                if (projectile.velocity != Vector2.Zero) 
+                {
+                    float k = (float)Math.Sin(projectile.localAI[0] / 30 * MathHelper.Pi);
+                    Vector2 Unit = Vector2.Normalize(projectile.velocity);
+                    Terraria.Utils.DrawLine(spriteBatch, projectile.Center, projectile.Center + Unit * 2000, Color.Cyan * k, Color.Cyan * k, 3);
+                } 
+            }
             Texture2D texture2D13 = Main.projectileTexture[projectile.type];
             int num156 = Main.projectileTexture[projectile.type].Height / Main.projFrames[projectile.type];
             int y3 = num156 * projectile.frame;

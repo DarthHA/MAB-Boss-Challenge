@@ -7,7 +7,7 @@ using Terraria.ModLoader;
 
 namespace MABBossChallenge.Projectiles.EchDestroyer
 {
-    public class WarpArena : ModProjectile
+    public class WarpArena2 : ModProjectile
     {
         public override void SetStaticDefaults()
         {
@@ -32,7 +32,6 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
             }
             if (!NPC.AnyNPCs(ModContent.NPCType<EchDestroyerHead>()) && projectile.ai[1] > 0) 
             {
-
                 projectile.ai[1] = -41; 
             }
             if (!ShouldAlive() && projectile.ai[1] > 0) 
@@ -56,7 +55,7 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
         {
             foreach(Player player in Main.player)
             {
-                if (player.Distance(projectile.Center) > 560 && !player.dead && player.active)
+                if (player.Distance(projectile.Center) > 680 && !player.dead && player.active)
                 {
                     Vector2 DragVel = Vector2.Normalize(projectile.Center - player.Center);
                     player.velocity += DragVel;
@@ -75,9 +74,9 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
                     {
                         player.mount.Dismount(player);
                     }
-                    if (player.Distance(projectile.Center) > 600)
+                    if (player.Distance(projectile.Center) > 680)
                     {
-                        player.Center = projectile.Center + Vector2.Normalize(player.Center - projectile.Center) * 540;
+                        player.Center = projectile.Center + Vector2.Normalize(player.Center - projectile.Center) * 679;
                     }
                 }
             }
@@ -87,12 +86,12 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
             float r = projectile.ai[1] * 14f;
             if (projectile.ai[1] < 40 && projectile.ai[1] >= 0)
             {
-                r = projectile.ai[1] * 14;
+                r = projectile.ai[1] * 17;
             }
-            if (projectile.ai[1] >= 40) r = 560;
+            if (projectile.ai[1] >= 40) r = 680;
             if (projectile.ai[1] < 0)
             {
-                r = (-projectile.ai[1] - 1) * 14;
+                r = (-projectile.ai[1] - 1) * 17;
             }
             for (float i = 0; i < MathHelper.TwoPi; i += MathHelper.Pi / 750)
             {
@@ -108,15 +107,14 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
 
         public bool ShouldAlive()
         {
-            foreach (Projectile proj in Main.projectile)
+            if (!NPC.AnyNPCs(ModContent.NPCType<EchDestroyerHead>()))
             {
-                if (proj.active && proj.type == ModContent.ProjectileType<WormHole>())
-                {
-                    if (proj.timeLeft >= 120)
-                    {
-                        return true;
-                    }
-                }
+                return false;
+            }
+            NPC head = Main.npc[NPC.FindFirstNPC(ModContent.NPCType<EchDestroyerHead>())];
+            if((head.modNPC as EchDestroyerHead).AIState == (int)EchDestroyerHead.WrapAIState.FlashBack)
+            {
+                return true;
             }
             return false;
         }

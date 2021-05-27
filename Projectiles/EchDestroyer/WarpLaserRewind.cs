@@ -8,13 +8,13 @@ using Terraria.ModLoader;
 
 namespace MABBossChallenge.Projectiles.EchDestroyer
 {
-    public class WarpLaser : ModProjectile
+    public class WarpLaserRewind : ModProjectile
     {
+        private Vector2 DefaultVelocity;
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Warp Laser");
-            DisplayName.AddTranslation(GameCulture.Chinese, "跃迁射线");
-            //DisplayName.AddTranslation(GameCulture.Chinese, "等离子束");
+            DisplayName.SetDefault("Warp Laser - Rewind");
+            DisplayName.AddTranslation(GameCulture.Chinese, "跃迁射线 - 倒带");
             Main.projFrames[projectile.type] = 4;
         }
 
@@ -43,11 +43,25 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
             }
             if (projectile.localAI[0] == 0)
             {
-                projectile.localAI[0]++;
+                DefaultVelocity = projectile.velocity;
                 Main.PlaySound(SoundID.Item12, projectile.Center);
             }
-
-            
+            projectile.localAI[0]++;
+            if (projectile.localAI[0] > 80)
+            {
+                if (projectile.localAI[0] < 105)
+                {
+                    projectile.velocity = DefaultVelocity * (105 - projectile.localAI[0]) / 25;
+                }
+                else if (projectile.localAI[0] < 115)
+                {
+                    projectile.velocity = Vector2.Zero;
+                }
+                else if (projectile.localAI[0] < 140)
+                {
+                    projectile.velocity = -DefaultVelocity * (projectile.localAI[0] - 115) / 25 * 4f;
+                }
+            }
 
             projectile.alpha -= 50;
             if (projectile.alpha < 0) projectile.alpha = 0;
@@ -55,9 +69,17 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
             if (++projectile.frameCounter > 5)
             {
                 projectile.frameCounter = 0;
-                projectile.frame = (projectile.frame + 1) % 4;
+                if (projectile.localAI[0] < 105)
+                {
+                    projectile.frame = (projectile.frame + 1) % 4;
+                }
+                else if (projectile.localAI[0] > 115)
+                {
+                    projectile.frame = projectile.frame - 1;
+                    if (projectile.frame < 0) projectile.frame = 3;
+                }
             }
-            projectile.rotation = projectile.velocity.ToRotation();
+            projectile.rotation = DefaultVelocity.ToRotation();
         }
 
         public override void Kill(int timeLeft)
@@ -90,10 +112,10 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
             return false;
         }
 
-
         public override void ModifyHitPlayer(Player target, ref int damage, ref bool crit)
         {
             if (damage < 60) damage = 60;
         }
+
     }
 }
