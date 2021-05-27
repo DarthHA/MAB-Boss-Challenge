@@ -25,8 +25,6 @@ namespace MABBossChallenge
         public bool ImprovedCelled = false;   //寄生
         public int CurrentHealth = 10000;    //寄生血量
 
-        public Item[] SaveItem  = new Item[2];
-        public bool ItemSaved = false;
 
         public override void ResetEffects()
         {
@@ -93,89 +91,6 @@ namespace MABBossChallenge
         }
         public override void PostUpdateMiscEffects()
         {
-            if (player.HasBuff(ModContent.BuffType<SolarEGOBuff>()))
-            {
-                player.AddBuff(BuffID.SolarShield3, 5, false);
-                player.setSolar = true;
-                player.solarCounter++;
-                int solarCD = 240;
-                if (player.solarCounter >= solarCD)
-                {
-                    if (player.solarShields > 0 && player.solarShields < 3)
-                    {
-                        for (int i = 0; i < 22; i++)
-                        {
-                            if (player.buffType[i] >= BuffID.SolarShield1 && player.buffType[i] <= BuffID.SolarShield2)
-                            {
-                                player.DelBuff(i);
-                            }
-                        }
-                    }
-                    if (player.solarShields < 3)
-                    {
-                        player.AddBuff(BuffID.SolarShield1 + player.solarShields, 5, false);
-                        for (int i = 0; i < 16; i++)
-                        {
-                            Dust dust = Main.dust[Dust.NewDust(player.position, player.width, player.height, 6, 0f, 0f, 100)];
-                            dust.noGravity = true;
-                            dust.scale = 1.7f;
-                            dust.fadeIn = 0.5f;
-                            dust.velocity *= 5f;
-                        }
-                        player.solarCounter = 0;
-                    }
-                    else
-                    {
-                        player.solarCounter = solarCD;
-                    }
-                }
-                for (int i = player.solarShields; i < 3; i++)
-                {
-                    player.solarShieldPos[i] = Vector2.Zero;
-                }
-                for (int i = 0; i < player.solarShields; i++)
-                {
-                    player.solarShieldPos[i] += player.solarShieldVel[i];
-                    Vector2 value = (player.miscCounter / 100f * MathHelper.TwoPi + i * (MathHelper.TwoPi / player.solarShields)).ToRotationVector2() * 6f;
-                    value.X = player.direction * 20;
-                    player.solarShieldVel[i] = (value - player.solarShieldPos[i]) * 0.2f;
-                }
-                if (player.dashDelay >= 0)
-                {
-                    player.solarDashing = false;
-                    player.solarDashConsumedFlare = false;
-                }
-                bool flag = player.solarDashing && player.dashDelay < 0;
-                if (player.solarShields > 0 || flag)
-                {
-                    player.dash = 3;
-                }
-                player.endurance = 45;
-                player.statDefense = 100;
-                player.meleeSpeed = 0.5f;
-                player.meleeDamage += 1f;
-                player.meleeCrit += 50;
-                if (!ItemSaved)
-                {
-                    ItemSaved = true;
-                    SaveItem[0] = player.inventory[0].DeepClone();
-                    SaveItem[1] = player.inventory[1].DeepClone();
-                    player.inventory[0].SetDefaults(ItemID.DayBreak);
-                    player.inventory[1].SetDefaults(ItemID.SolarEruption);
-                }
-            }
-            else
-            {
-                if (ItemSaved) 
-                {
-                    ItemSaved = false;
-                    player.inventory[0] = SaveItem[0].DeepClone();
-                    player.inventory[1] = SaveItem[1].DeepClone();
-                    SaveItem[0] = new Item();
-                    SaveItem[1] = new Item();
-                }
-            }
-
 
             if (MABBossChallenge.AmmoChangeKey.JustReleased)
             {
@@ -210,6 +125,14 @@ namespace MABBossChallenge
 
         }
 
+        public override void PostUpdateEquips()
+        {
+            if (NPCUtils.InWall(player.Center, ModContent.WallType<Walls.ArenaWall>()))
+            {
+                player.wingTime = 0;
+            }
+        }
+
         public override void UpdateBadLifeRegen()
         {
             if (ImprovedCelled)
@@ -236,39 +159,8 @@ namespace MABBossChallenge
 
         }
 
-        public override void PostUpdateEquips()
-        {
-            if (player.HasBuff(ModContent.BuffType<SolarEGOBuff>()))
-            {
-                Item item = new Item();
-                item.SetDefaults(ItemID.WingsSolar);
-                bool flag = false;
-                player.VanillaUpdateAccessory(player.whoAmI, item, true, ref flag, ref flag, ref flag);
-                player.wingTime = player.wingTimeMax;
-            }
-        }
-        public override void UpdateEquips(ref bool wallSpeedBuff, ref bool tileSpeedBuff, ref bool tileRangeBuff)
-        {
 
-        }
-        public override void UpdateAutopause()
-        {
-            if (NPC.AnyNPCs(ModContent.NPCType<EchDestroyerHead>()))
-            {
-                Main.autoPause = false;
-            }
-        }
-        public override void FrameEffects()
-        {
-            //solar
-            if (player.HasBuff(ModContent.BuffType<SolarEGOBuff>()))
-            {
-                player.head = 171;
-                player.body = 177;
-                player.legs = 112;
-                player.wings = 29;
-            }
-        }
+
 
         public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource)
         {
@@ -354,6 +246,8 @@ namespace MABBossChallenge
                 player.ManageSpecialBiomeVisuals("MABBossChallenge:StardustBossSky", IsStardustBoss, default);
                 player.ManageSpecialBiomeVisuals("Stardust", IsStardustBoss || player.ZoneTowerStardust, new Vector2(Main.dungeonX, Main.dungeonY));
 
+
+                player.ManageSpecialBiomeVisuals("MABBossChallenge:WarpSky", true, default);
             }
         }
 
@@ -370,7 +264,6 @@ namespace MABBossChallenge
 
         public override void PreSavePlayer()
         {
-            Main.autoPause = MABWorld.AutoPause;
             if (NPC.FindFirstNPC(ModContent.NPCType<MeteorPlayerNPC1>()) != -1)
             {
                 NPC npc = Main.npc[NPC.FindFirstNPC(ModContent.NPCType<MeteorPlayerNPC1>())];

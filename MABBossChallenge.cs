@@ -1,15 +1,21 @@
 ﻿using MABBossChallenge.Items;
+using MABBossChallenge.Items.EGO;
+using MABBossChallenge.Items.Musicbox;
+using MABBossChallenge.NPCs.EchDestroyer;
 using MABBossChallenge.NPCs.MiniPlayerBoss;
 using MABBossChallenge.NPCs.PlayerBoss;
-using MABBossChallenge.NPCs.EchDestroyer;
 using MABBossChallenge.Sky;
+using MABBossChallenge.Sky.Ech;
+using MABBossChallenge.Tiles;
 using MABBossChallenge.UI;
 using MABBossChallenge.Utils;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Graphics.Effects;
+using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -31,11 +37,17 @@ namespace MABBossChallenge
 
         public override void Load()
         {
-            AmmoChangeKey = RegisterHotKey("Swap Ammo Key", "Z");
-
+            if (Language.ActiveCulture == GameCulture.Chinese)
+            {
+                AmmoChangeKey = RegisterHotKey("换弹药快捷键", "Z");
+            }
+            else
+            {
+                AmmoChangeKey = RegisterHotKey("Swap Ammo Key", "Z");
+            }
             Filters.Scene["MABBossChallenge:SolarBossSky"] = new Filter(new CustomScreenShaderData("FilterMiniTower").UseColor(0.255f, 0f, 0f).UseOpacity(0.2f), EffectPriority.VeryHigh);
             SkyManager.Instance["MABBossChallenge:SolarBossSky"] = new SolarBossSky();
-            
+
             Filters.Scene["MABBossChallenge:VortexBossSky"] = new Filter(new CustomScreenShaderData("FilterMiniTower").UseColor(0.255f, 0f, 0f).UseOpacity(0.2f), EffectPriority.VeryHigh);
             SkyManager.Instance["MABBossChallenge:VortexBossSky"] = new VortexBossSky();
 
@@ -45,29 +57,70 @@ namespace MABBossChallenge
             Filters.Scene["MABBossChallenge:StardustBossSky"] = new Filter(new CustomScreenShaderData("FilterMiniTower").UseColor(0.255f, 0f, 0f).UseOpacity(0.2f), EffectPriority.VeryHigh);
             SkyManager.Instance["MABBossChallenge:StardustBossSky"] = new StardustBossSky();
 
+            Filters.Scene["MABBossChallenge:WarpSky"] = new Filter(new CustomScreenShaderData("FilterMiniTower").UseColor(0.255f, 0f, 0f).UseOpacity(0.1f), EffectPriority.VeryHigh);
+            SkyManager.Instance["MABBossChallenge:WarpSky"] = new WarpSky();
+
+            //Filters.Scene["MABBossChallenge:Shockwave"] = new Filter(
+            //new CustomScreenShaderData(new Ref<Effect>(GetEffect("Effects/Shockwave")), "Shockwave"), EffectPriority.Medium);
+            //Filters.Scene["MABBossChallenge:Shockwave"].Load();
+
+            Filters.Scene["MABBossChallenge:Shockwave"] = new Filter(new ScreenShaderData(new Ref<Effect>(GetEffect("Effects/Content/Shockwave")), "Shockwave"), EffectPriority.VeryHigh);
+            Filters.Scene["MABBossChallenge:Shockwave"].Load();
+
+            Filters.Scene["MABBossChallenge:WarpEffect"] = new Filter(new ScreenShaderData(new Ref<Effect>(GetEffect("Effects/Content/WarpEffect")), "WarpEffect"), EffectPriority.VeryHigh);
+            Filters.Scene["MABBossChallenge:WarpEffect"].Load();
 
 
             _BossState = new BossState();
             _BossStateInterface = new UserInterface();
             _BossStateInterface.SetState(_BossState);
 
+            AddMusicBox(GetSoundSlot(SoundType.Music, "Sounds/Music/Destiny"), ModContent.ItemType<SolarMusicbox>(), ModContent.TileType<SolarMusicboxSheet>());
+            AddMusicBox(GetSoundSlot(SoundType.Music, "Sounds/Music/Ex Mechina"), ModContent.ItemType<VortexMusicbox>(), ModContent.TileType<VortexMusicboxSheet>());
+            AddMusicBox(GetSoundSlot(SoundType.Music, "Sounds/Music/The Last Guardian"), ModContent.ItemType<NebulaMusicbox>(), ModContent.TileType<NebulaMusicboxSheet>());
+            AddMusicBox(GetSoundSlot(SoundType.Music, "Sounds/Music/Heroic"), ModContent.ItemType<DefenderMusicbox>(), ModContent.TileType<DefenderMusicboxSheet>());
+            AddMusicBox(GetSoundSlot(SoundType.Music, "Sounds/Music/Running Out of Nights"), ModContent.ItemType<EchMusicbox>(), ModContent.TileType<EchMusicboxSheet>());
 
-            On.Terraria.Projectile.Update += new On.Terraria.Projectile.hook_Update(ProjUpdateHook);
-            On.Terraria.NPC.UpdateNPC += new On.Terraria.NPC.hook_UpdateNPC(NPCUpdateHook);
-            //On.Terraria.NPC.UpdateCollision += new On.Terraria.NPC.hook_UpdateCollision(NPCCollisionUpdate);
-            On.Terraria.Dust.UpdateDust += new On.Terraria.Dust.hook_UpdateDust(DustUpdateHook);
-            //On.Terraria.Dust.NewDust += new On.Terraria.Dust.hook_NewDust(NewDustHook);
-            On.Terraria.Star.UpdateStars += new On.Terraria.Star.hook_UpdateStars(StarUpdateHook);
-            On.Terraria.Rain.Update += new On.Terraria.Rain.hook_Update(RainUpdateHook);
-            On.Terraria.Cloud.UpdateClouds += new On.Terraria.Cloud.hook_UpdateClouds(CloudUpdateHook);
-            On.Terraria.Item.UpdateItem += new On.Terraria.Item.hook_UpdateItem(ITemUpdateHook);
-            On.Terraria.Gore.Update += new On.Terraria.Gore.hook_Update(UpdateGore);
-            On.Terraria.Player.Update += new On.Terraria.Player.hook_Update(UpdatePlayerHook);
+
+            PortalUtils.Load();
+            EGOUtils.Load();
+        }
+
+        public override void AddRecipes()
+        {
+            AddRPCraft(ItemID.HermesBoots, 2);
+            AddRPCraft(ItemID.FlurryBoots, 2);
+            AddRPCraft(ItemID.FrogLeg, 3);
+            AddRPCraft(ItemID.Aglet, 1);
+            AddRPCraft(ItemID.ShinyRedBalloon, 1);
+            AddRPCraft(ItemID.AnkletoftheWind, 2);
+            AddRPCraft(ItemID.LuckyHorseshoe, 2);
+            AddRPCraft(ItemID.BlizzardinaBottle, 2);
+            AddRPCraft(ItemID.CloudinaBottle, 1);
+            AddRPCraft(ItemID.TsunamiInABottle, 2);
+            AddRPCraft(ItemID.SandstorminaBottle, 3);
+            AddRPCraft(ItemID.ObsidianSkull, 1);
+            AddRPCraft(ItemID.LavaCharm, 2);
+            AddRPCraft(ItemID.IceSkates, 2);
+            AddRPCraft(ItemID.WhoopieCushion, 2);
+            AddRPCraft(ItemID.SharkToothNecklace, 2);
+            AddRPCraft(ItemID.Shackle, 1);
+            AddRPCraft(ItemID.FeralClaws, 2);
+            AddRPCraft(ItemID.NaturesGift, 2);
+            AddRPCraft(ItemID.ShoeSpikes, 1);
+            AddRPCraft(ItemID.ClimbingClaws, 1);
+            AddRPCraft(ItemID.FlyingCarpet, 2);
+            AddRPCraft(ItemID.MagmaStone, 2);
+            AddRPCraft(ItemID.ObsidianRose, 2);
+            AddRPCraft(ItemID.PocketMirror, 2);
+            AddRPCraft(ItemID.HandWarmer, 2);
         }
 
         public override void PostSetupContent()
         {
             Main.versionNumber = "Ech";
+
+            AddTrans();
 
             //联动BCL
             AddToBCL();
@@ -75,8 +128,6 @@ namespace MABBossChallenge
             //联动Fargo
             AddToFargo();
 
-
-            AddTrans();
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -103,146 +154,40 @@ namespace MABBossChallenge
             SkyManager.Instance["MABBossChallenge:VortexBossSky"].Deactivate();
             SkyManager.Instance["MABBossChallenge:NebulaBossSky"].Deactivate();
             SkyManager.Instance["MABBossChallenge:StardustBossSky"].Deactivate();
+            SkyManager.Instance["MABBossChallenge:WarpSky"].Deactivate();
 
             AmmoChangeKey = null;
             Instance = null;            //用于正常卸载
             mabconfig = null;
-            //Environment.Exit(0);
+            PortalUtils.UnLoad();
+            EGOUtils.UnLoad();
         }
 
-        public static void UpdateGore(On.Terraria.Gore.orig_Update orig, Gore self)
-        {
-            if (MABWorld.CurrentTime > 0) 
-            {
-                for (int i = 0; i < MABWorld.AcutalCurrentTime; i++)
-                {
-                    orig.Invoke(self);
-                }
-            }
-            
-        }
-        public static void ITemUpdateHook(On.Terraria.Item.orig_UpdateItem orig, Item self, int i)
-        {
-            if (MABWorld.CurrentTime > 0)
-            {
-                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
-                {
-                    orig.Invoke(self, i);
-                }
-            }
-        }
-        public static void CloudUpdateHook(On.Terraria.Cloud.orig_UpdateClouds orig)
-        {
-            if (MABWorld.CurrentTime > 0)
-            {
-                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
-                {
-                    orig.Invoke();
-                }
-            }
-        }
-        public static void RainUpdateHook(On.Terraria.Rain.orig_Update orig, Rain self)
-        {
-            if (MABWorld.CurrentTime > 0)
-            {
-                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
-                {
-                    orig.Invoke(self);
-                }
-            }
-        }
-        public static void StarUpdateHook(On.Terraria.Star.orig_UpdateStars orig)
-        {
-            if (MABWorld.CurrentTime > 0)
-            {
-                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
-                {
-                    orig.Invoke();
-                }
-            }
-        }
-        public static void ProjUpdateHook(On.Terraria.Projectile.orig_Update orig, Projectile self, int i)
-        {
-            if (MABWorld.CurrentTime > 0)
-            {
-                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
-                {
-                    orig.Invoke(self, i);
-                }
-            }
-            if (MABWorld.CurrentTime == 0) 
-            {
-                if (PortalUtils.ProjList.Contains(self.type))
-                {
-                    orig.Invoke(self, i);
-                }
-                else
-                {
-                    self.Damage();
-                }
-            }
-        }
-        public static void NPCUpdateHook(On.Terraria.NPC.orig_UpdateNPC orig, NPC self, int i)
-        {
-            if (MABWorld.CurrentTime > 0)
-            {
-                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
-                {
-                    orig.Invoke(self, i);
-                }
-            }
-            if (MABWorld.CurrentTime == 0)
-            {
-                if (PortalUtils.NPCList.Contains(self.type))
-                {
-                    orig.Invoke(self, i);
-                }
-            }
 
+        
+
+        private void AddRPCraft(int type,int amount)
+        {
+            ModRecipe recipe = new ModRecipe(this);
+            recipe.AddIngredient(ItemID.RedPotion, amount * 3);
+            recipe.SetResult(type);
+            recipe.AddTile(TileID.DemonAltar);
+            recipe.AddRecipe();
         }
 
-        public static void DustUpdateHook(On.Terraria.Dust.orig_UpdateDust orig)
-        {
-            if (MABWorld.CurrentTime > 0)
-            {
-                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
-                {
-                    orig.Invoke();
-                }
-            }
-            if (MABWorld.CurrentTime == 0)
-            {
-                orig.Invoke();
-            }
-        }
-
-        public static void UpdatePlayerHook(On.Terraria.Player.orig_Update orig,Player self,int i)
-        {
-            if (MABWorld.CurrentTime > 0)
-            {
-                for (int t = 0; t < MABWorld.AcutalCurrentTime; t++)
-                {
-                    orig.Invoke(self, i);
-                }
-            }
-            if (MABWorld.CurrentTime == 0)
-            {
-                orig.Invoke(self, i);
-            }
-
-        }
 
         private void AddTrans()
         {
-            ModTranslation CustomText = MABBossChallenge.Instance.CreateTranslation("DayBreakDescription");
+            ModTranslation CustomText = Instance.CreateTranslation("DayBreakDescription");
             CustomText.SetDefault("Incenerated by solar rays\nThe more hit you get from solar attack, the worse of this debuff\nLevel: ");
             CustomText.AddTranslation(GameCulture.Chinese, "被太阳光线焚烧\n受到日耀的攻击越多，该效果将会变得更严重\n层数：");
-            MABBossChallenge.Instance.AddTranslation(CustomText);
+            Instance.AddTranslation(CustomText);
 
             TranslationUtils.AddTranslation("GenerateBattleWarning", "Detecting that this world hasn't generate Battlefield. Try using the Battlefield Generator to generate one!", "检测到该世界没有生成战场！尝试使用战场生成器来创建一个！");
             TranslationUtils.AddTranslation("MeteorGuardianNPCName", "Nameless", "无名");
             TranslationUtils.AddTranslation("TrueFight", "The real battle has just begun...", "真正的战斗才刚刚开始...");
-            
+            TranslationUtils.AddTranslation("TombText", " was defeated by ", "被击败了，凶手是");
+
             TranslationUtils.AddTranslation("GuardianBro", "Evil Guardian Borthers", "邪恶守护者兄弟");
             TranslationUtils.AddTranslation("GuardianBroDescription", "Duo from the Evils", "来自邪恶之地的二重奏");
 
@@ -343,6 +288,7 @@ namespace MABBossChallenge
                 {
                     //ItemID.DestroyerMask,
                     //ItemID.DestroyerTrophy,
+                    ModContent.ItemType<DefenderMusicbox>(),
                 };
                 array[8] = new List<int>
                 {
@@ -368,6 +314,7 @@ namespace MABBossChallenge
                 {
                     //ItemID.DestroyerMask,
                     //ItemID.DestroyerTrophy,
+                    ModContent.ItemType<DefenderMusicbox>(),
                 };
                 array[8] = new List<int>
                 {
@@ -394,6 +341,7 @@ namespace MABBossChallenge
                 {
                     //ItemID.DestroyerMask,
                     //ItemID.DestroyerTrophy,
+                    ModContent.ItemType<DefenderMusicbox>(),
                 };
                 array[8] = new List<int>
                 {
@@ -421,6 +369,7 @@ namespace MABBossChallenge
                 {
                     //ItemID.DestroyerMask,
                     //ItemID.DestroyerTrophy,
+                    ModContent.ItemType<DefenderMusicbox>(),
                 };
                 array[8] = new List<int>
                 {
@@ -447,12 +396,16 @@ namespace MABBossChallenge
                 {
                     //ItemID.DestroyerMask,
                     //ItemID.DestroyerTrophy,
+                    ModContent.ItemType<EchMusicbox>(),
                 };
                 array[8] = new List<int>
                 {
-
+                    ItemID.Nanites,
+                    ItemID.RodofDiscord,
+                    ItemID.PortalGun,
                 };
                 array[9] = "Using [i:" + ModContent.ItemType<EchSummon>() + "] to summon.";
+                array[10] = "Warp Destroyer returns to its dimension.";
                 array[11] = "MABBossChallenge/BossChecklist/WarpDestroyer_BCL";
                 mod1.Call(array);
 
@@ -469,6 +422,7 @@ namespace MABBossChallenge
                 {
                     //ItemID.DestroyerMask,
                     //ItemID.DestroyerTrophy,
+                    ModContent.ItemType<SolarMusicbox>(),
                 };
                 array[8] = new List<int>
                 {
@@ -480,8 +434,8 @@ namespace MABBossChallenge
                     ItemID.Terrarian,
                     ItemID.SolarFlareHelmet,
                     ItemID.SolarFlareBreastplate,
-                    ItemID.SolarFlareLeggings
-
+                    ItemID.SolarFlareLeggings,
+                    ModContent.ItemType<SolarEGOStarter>()
                 };
                 array[9] = "Using [i:" + ModContent.ItemType<PlayerSummon1>() + "] after defeating Solar Defender and Moon Lord.";
                 array[11] = "MABBossChallenge/BossChecklist/SolarFighter_BCL";
@@ -501,6 +455,7 @@ namespace MABBossChallenge
                 {
                     //ItemID.DestroyerMask,
                     //ItemID.DestroyerTrophy,
+                    ModContent.ItemType<VortexMusicbox>(),
                 };
                 array[8] = new List<int>
                 {
@@ -512,10 +467,11 @@ namespace MABBossChallenge
                     ItemID.MoonlordBullet,
                     ItemID.VortexHelmet,
                     ItemID.VortexBreastplate,
-                    ItemID.VortexLeggings
+                    ItemID.VortexLeggings,
+                    ModContent.ItemType<VortexEGOStarter>()
 
                 };
-                array[9] = array[9] = "Using [i:" + ModContent.ItemType<PlayerSummon2>() + "] after defeating Vortex Defender and Moon Lord.";
+                array[9] = "Using [i:" + ModContent.ItemType<PlayerSummon2>() + "] after defeating Vortex Defender and Moon Lord.";
                 array[11] = "MABBossChallenge/BossChecklist/VortexRanger_BCL";
                 mod1.Call(array);
 
@@ -532,7 +488,7 @@ namespace MABBossChallenge
                 array[6] = ModContent.ItemType<PlayerSummon3>();
                 array[7] = new List<int>
                 {
-
+                    ModContent.ItemType<NebulaMusicbox>(),
                 };
                 array[8] = new List<int>
                 {
@@ -546,11 +502,42 @@ namespace MABBossChallenge
                     ItemID.NebulaLeggings
 
                 };
-                array[9] = array[9] = "Using [i:" + ModContent.ItemType<PlayerSummon3>() + "] after defeating Nebula Defender and Moon Lord.";
+                array[9] = "Using [i:" + ModContent.ItemType<PlayerSummon3>() + "] after defeating Nebula Defender and Moon Lord.";
                 array[11] = "MABBossChallenge/BossChecklist/NebulaMage_BCL";
                 mod1.Call(array);
 
-                
+
+
+                mod1 = bossChecklist;
+                array = new object[12];
+                array[0] = "AddBoss";
+                array[1] = 14.4f;
+                array[2] = ModContent.NPCType<StardustSummonerBoss>();
+                array[3] = Instance;
+                array[4] = "Stardust ???";
+                array[5] = new Func<bool>(() => MABWorld.DownedStardustPlayerEX);
+                array[6] = ModContent.ItemType<PlayerSummon4>();
+                array[7] = new List<int>
+                {
+                    //ModContent.ItemType<NebulaMusicbox>(),
+                };
+                array[8] = new List<int>
+                {
+                    ItemID.FragmentStardust,
+                    ItemID.StardustCellStaff,
+                    ItemID.StardustDragonStaff,
+                    ItemID.MoonlordTurretStaff,
+                    ItemID.RainbowCrystalStaff,
+                    ItemID.StardustBreastplate,
+                    ItemID.StardustHelmet,
+                    ItemID.StardustLeggings
+
+                };
+                array[9] = "Using [i:" + ModContent.ItemType<PlayerSummon4>() + "] after defeating Stardust Defender and Moon Lord.";
+                array[11] = "MABBossChallenge/BossChecklist/StardustSummoner_BCL";
+                mod1.Call(array);
+
+
             }
         }
 
@@ -573,6 +560,7 @@ namespace MABBossChallenge
         }
     }
 
+    /*
     public class TimeStopGlobalNPC : GlobalNPC
     {
         public override bool? CanBeHitByProjectile(NPC npc, Projectile projectile)
@@ -586,6 +574,7 @@ namespace MABBossChallenge
         }
     }
 
+    
     public class TimeStopGlobalProjectile : GlobalProjectile
     {
         public override bool InstancePerEntity => true;
@@ -620,4 +609,5 @@ namespace MABBossChallenge
             return true;
         }
     }
+    */
 }

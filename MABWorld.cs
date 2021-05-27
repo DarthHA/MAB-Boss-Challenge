@@ -1,6 +1,4 @@
-﻿using MABBossChallenge.Buffs;
-using MABBossChallenge.NPCs.EchDestroyer;
-using MABBossChallenge.Tiles;
+﻿using MABBossChallenge.Tiles;
 using MABBossChallenge.Walls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,11 +16,6 @@ namespace MABBossChallenge
 {
     public class MABWorld : ModWorld
     {
-        public static float CurrentTime;
-        public static int AcutalCurrentTime;
-        public static bool AutoPause = true;
-        public static bool EchActive = false;
-
 
         public static bool IsCreated;
         public static bool DownedMeteorPlayer;
@@ -37,6 +30,7 @@ namespace MABBossChallenge
         public static bool DownedSolarPlayerEX;
         public static bool DownedVortexPlayerEX;
         public static bool DownedNebulaPlayerEX;
+        public static bool DownedStardustPlayerEX;
         public override TagCompound Save()
         {
             return new TagCompound {
@@ -53,6 +47,7 @@ namespace MABBossChallenge
             {"DownedSolarPlayerEX", DownedSolarPlayerEX},
             {"DownedVortexPlayerEX", DownedVortexPlayerEX},
             {"DownedNebulaPlayerEX", DownedNebulaPlayerEX},
+            {"DownedStardustPlayerEX", DownedStardustPlayerEX},
             };
         }
 
@@ -71,6 +66,7 @@ namespace MABBossChallenge
             DownedVortexPlayer = false;
             DownedSolarPlayerEX = false;
             DownedNebulaPlayerEX = false;
+            DownedStardustPlayerEX = false;
         }
         public override void Load(TagCompound tag)
         {
@@ -87,58 +83,11 @@ namespace MABBossChallenge
             DownedSolarPlayerEX = tag.GetBool("DownedSolarPlayerEX");
             DownedVortexPlayerEX = tag.GetBool("DownedVortexPlayerEX");
             DownedNebulaPlayerEX = tag.GetBool("DownedNebulaPlayerEX");
+            DownedStardustPlayerEX = tag.GetBool("DownedStardustPlayerEX");
 
         }
 
-        public override void PostUpdate()
-        {
-            Main.time += CurrentTime - 1;
-            if (!Main.LocalPlayer.HasBuff(ModContent.BuffType<TimeDisort>()))
-            {
-                CurrentTime = 1;
-            }
-        }
-        public override void PreUpdate()
-        {
-            if ((int)CurrentTime != CurrentTime)  
-            {
-                int b = (int)CurrentTime;
-                if (Main.rand.NextFloat() <= CurrentTime - b) 
-                {
-                    AcutalCurrentTime = 1 + b;
-                }
-                else
-                {
-                    AcutalCurrentTime = b;
-                }
-            }
-            else
-            {
-                AcutalCurrentTime = (int)CurrentTime;
-            }
-
-            if (!NPC.AnyNPCs(ModContent.NPCType<EchDestroyerHead>()))
-            {
-                if (EchActive)
-                {
-                    EchActive = false;
-                    Main.autoPause = AutoPause;
-                }
-            }
-            else
-            {
-                if (!EchActive)
-                {
-                    AutoPause = Main.autoPause;
-                    EchActive = true;
-                }
-                else
-                {
-                    Main.autoPause = false;
-                }
-            }
-
-        }
+       
 
 
 

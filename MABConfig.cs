@@ -11,18 +11,18 @@ namespace MABBossChallenge
         public override ConfigScope Mode => ConfigScope.ServerSide;
 
         [DefaultValue(false)]
-        [Label("Meteor Guardian will join in Boss fight")]
-        //[Tooltip("开启之后陨石守卫会在Boss战中参与攻击，默认为否")]
+        [Label("$Mods.MABBossChallenge.MeteorGuardianConfig1")]
+        //[Tooltip("开启之后陨石守卫会在Boss战中参与攻击")]
         public bool NPCAttackBoss;
 
         [DefaultValue(true)]
-        [Label("Meteor Guardian will use its own BGM when fighting")]
-        //[Tooltip("开启之后陨石守卫NPC会在战斗中使用BGM，默认为是")]
+        [Label("$Mods.MABBossChallenge.MeteorGuardianConfig2")]
+        //[Tooltip("开启之后陨石守卫NPC会在战斗中使用自己的BGM")]
         public bool NPCAttackBGM;
 
         [DefaultValue(true)]
-        [Label("Initialize filters when fighting bosses")]
-        //[Tooltip("Boss战是否打开滤镜")]
+        [Label("$Mods.MABBossChallenge.UseFiltersConfig")]
+        //[Tooltip("Boss战是否启用滤镜")]
         public bool BossFightFilters;
 
 
@@ -35,8 +35,9 @@ namespace MABBossChallenge
         public override void OnLoaded()
         {
             MABBossChallenge.mabconfig = this;
-            TranslationUtils.AddTranslation("MeteorGuardianConfig1", "Meteor Guardian joins in Boss fight", "陨石守卫参与Boss战");
-            TranslationUtils.AddTranslation("MeteorGuardianConfig2", "Meteor Guardian uses its own BGM when fighting", "陨石守卫战斗时使用BGM");
+            TranslationUtils.AddTranslation("MeteorGuardianConfig1", "Meteor Guardian(NPC) willjoin in Boss fight", "陨石守卫NPC参与Boss战");
+            TranslationUtils.AddTranslation("MeteorGuardianConfig2", "Meteor Guardian(NPC) will use his own BGM when fighting", "陨石守卫NPC战斗时使用BGM");
+            TranslationUtils.AddTranslation("UseFiltersConfig", "Initialize filters when fighting bosses", "Boss战启用滤镜");
         }
 
 

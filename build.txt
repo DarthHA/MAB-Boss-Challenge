@@ -1,4 +1,4 @@
 displayName = MAB Boss Challenge
 author = Volknet_Online(网络核心)
-version = 0.18
+version = 0.27
 homepage = https://space.bilibili.com/442236013

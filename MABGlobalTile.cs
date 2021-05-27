@@ -31,6 +31,12 @@ namespace MABBossChallenge
                 SummonMeteorDefender(type, i, j);
                 return false;
             }
+            if (Main.tile[i, j].wall == ModContent.WallType<ArenaWall>() &&
+                type != TileID.Tombstones &&
+                type != TileID.Torches)
+            {
+                return false;
+            }
             return true;
         }
 
@@ -41,7 +47,10 @@ namespace MABBossChallenge
                 SummonMeteorDefender(type, i, j);
                 return false;
             }
-
+            if (Main.tile[i, j].wall == ModContent.WallType<ArenaWall>())
+            {
+                return false;
+            }
             return true;
         }
 
@@ -58,7 +67,7 @@ namespace MABBossChallenge
 
         public override bool CanPlace(int i, int j, int type)
         {
-            if (!MABWorld.DownedPreEvilFighter && Main.tile[i, j].wall == ModContent.WallType<ArenaWall>()) return false;
+            if (Main.tile[i, j].wall == ModContent.WallType<ArenaWall>() && type != TileID.Torches) return false;
             return true;
         }
 
