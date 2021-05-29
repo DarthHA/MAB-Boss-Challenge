@@ -1,6 +1,7 @@
 ﻿using MABBossChallenge.NPCs.EchDestroyer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
@@ -12,10 +13,11 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
     public class WarpCrack : ModProjectile
     {
         readonly int BaseLength = 110;           //120
+        readonly float NodeCount = 28;
         List<float> Rot = new List<float>();
         List<float> Length = new List<float>();
         float MaxLength = 0;
-        float NodeCount = 36;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Warp Crack");
@@ -90,7 +92,7 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
         }
         public override void OnHitPlayer(Player target, int damage, bool crit)
         {
-            target.velocity = Vector2.Zero;
+            //target.velocity = Vector2.Zero;
             //target.AddBuff(ModContent.BuffType<TimeDisort>(), 180);
         }
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
@@ -105,7 +107,7 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
             int len = tex.Height - 1;
             if (Rot.Count > 0)
             {
-                float Width = projectile.localAI[0] / 20;
+                float Scale = projectile.localAI[0] / 20;
                 float len2 = 0;
                 Vector2 Pos = projectile.Center;
                 for(int i = 0; i < Rot.Count; i++)
@@ -116,15 +118,18 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
                         float actualWidth;
                         if (len2 <= MaxLength / 2) 
                         {
-                            actualWidth = Width * (len2 / (MaxLength / 2));
+                            actualWidth = len2 / (MaxLength / 2);
                         }
                         else
                         {
-                            actualWidth = Width * ((MaxLength - len2) / (MaxLength / 2));
+                            actualWidth = (MaxLength - len2) / (MaxLength / 2);
                         }
                         actualWidth = (int)(actualWidth * tex.Width);
-                        Rectangle rectangle = new Rectangle((int)(tex.Width - actualWidth) / 2, 0, (int)actualWidth, tex.Height);
-                        rectangle = new Rectangle(0, 0, (int)actualWidth, tex.Height);
+                        if (actualWidth < 3) actualWidth = 3;
+                        actualWidth *= Scale;
+
+                        //Rectangle rectangle = new Rectangle((int)(tex.Width - actualWidth) / 2, 0, (int)actualWidth, tex.Height);
+                        Rectangle rectangle = new Rectangle(0, 0, (int)actualWidth, tex.Height);
                         rectangle.X += (int)(RanPos + Pos + (projectile.rotation + Rot[i]).ToRotationVector2() * j - Main.screenPosition).X;
                         rectangle.Y += (int)(RanPos + Pos + (projectile.rotation + Rot[i]).ToRotationVector2() * j - Main.screenPosition).Y;
                         spriteBatch.Draw(tex, rectangle, null, Color.White, projectile.rotation + MathHelper.Pi / 2, rectangle.Size() / 2, SpriteEffects.None, 0);
@@ -145,7 +150,8 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
                 Vector2 Pos = projectile.Center;
                 for (int i = 0; i < Rot.Count; i++)
                 {
-                    if(Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Pos, Pos + (projectile.rotation + Rot[i]).ToRotationVector2() * Length[i], 15, ref point))
+                    float k = (float)Math.Sin((float)i / Rot.Count * MathHelper.Pi);
+                    if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Pos, Pos + (projectile.rotation + Rot[i]).ToRotationVector2() * Length[i], 15 * k, ref point))
                     {
                         result = true;
                     }

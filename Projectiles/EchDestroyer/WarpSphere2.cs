@@ -1,4 +1,4 @@
-Ôªøusing Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
@@ -6,12 +6,14 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 namespace MABBossChallenge.Projectiles.EchDestroyer
 {
-    public class WarpSphere : ModProjectile
+    public class WarpSphere2 : ModProjectile
     {
+        public Vector2 CenterPos = Vector2.Zero;
+        public float R = 200;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Warp Sphere");
-            DisplayName.AddTranslation(GameCulture.Chinese, "Ë∑ÉËøÅËÉΩÈáèÂºπ");
+            DisplayName.AddTranslation(GameCulture.Chinese, "‘æ«®ƒ‹¡øµØ");
             Main.projFrames[projectile.type] = 5;
         }
         public override void SetDefaults()
@@ -33,26 +35,25 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
             {
                 Main.PlaySound(SoundID.Item20, projectile.Center);
             }
+
+
             projectile.localAI[0]++;
-            if (projectile.timeLeft < 60)
+            if (projectile.localAI[0] <= 240)
             {
-                projectile.Opacity = (float)projectile.timeLeft / 60;
-            }
-            else
-            {
-                projectile.alpha -= 50;
+                projectile.alpha -= 20;
                 if (projectile.alpha < 0)
                 {
                     projectile.alpha = 0;
                 }
-                if (projectile.localAI[0] > 20)
+                projectile.Center = CenterPos + (projectile.localAI[0] * MathHelper.TwoPi / 240 * projectile.localAI[1] - MathHelper.Pi / 2).ToRotationVector2() * R;
+            }
+            else
+            {
+                projectile.alpha += 20;
+                if (projectile.alpha > 250)
                 {
-                    Player target = Main.player[Player.FindClosest(projectile.Center, 1, 1)];
-                    if (projectile.Distance(target.Center) < 150)
-                    {
-                        Vector2 MoveVel = Vector2.Normalize(target.Center - projectile.Center) * 5;
-                        projectile.velocity = (projectile.velocity * 93 + MoveVel * 8) / 100;
-                    }
+                    projectile.Kill();
+                    return;
                 }
             }
             if (++projectile.frameCounter > 5)
@@ -62,22 +63,14 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
             }
         }
 
-        public override bool CanDamage()
-        {
-            return projectile.timeLeft > 30;
-        }
 
-        public override void OnHitPlayer(Player target, int damage, bool crit)
-        {
-            //target.AddBuff(ModContent.BuffType<TimeDisort>(), 120);
-        }
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
             damage *= 10;
         }
         public override bool CanHitPlayer(Player target)
         {
-            if (projectile.localAI[0] <= 20)
+            if (projectile.localAI[0] <= 20 || projectile.localAI[0] > 240)
             {
                 return false;
             }
@@ -92,10 +85,21 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
             return false;
         }
 
+        public static void SummonSphere(Vector2 Center, float r, int dmg, int dir)
+        {
+            int protmp = Projectile.NewProjectile(Center + new Vector2(0, -r), Vector2.Zero, ModContent.ProjectileType<WarpSphere2>(), dmg, 0, default);
+            (Main.projectile[protmp].modProjectile as WarpSphere2).CenterPos = Center;
+            (Main.projectile[protmp].modProjectile as WarpSphere2).R = r;
+            Main.projectile[protmp].localAI[1] = dir;
+        }
+
         public override void ModifyHitPlayer(Player target, ref int damage, ref bool crit)
         {
             if (damage < 60) damage = 60;
         }
-
+        public override bool ShouldUpdatePosition()
+        {
+            return false;
+        }
     }
 }

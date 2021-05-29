@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -56,6 +57,21 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
                 }
             }
             projectile.rotation = -MathHelper.Pi / 2;
+
+            projectile.localAI[1]++;
+            if (projectile.localAI[1] % 80 == 40)
+            {
+                float r1 = Main.rand.Next(200, 720 - 160);
+                float r2 = r1 + 160;
+                for (float i = 200; i < 720; i += 70)
+                {
+                    if (i < r1 || i > r2)
+                    {
+                        WarpSphere2.SummonSphere(projectile.Center, i, projectile.damage, -Math.Sign(projectile.velocity.X));
+                    }
+                }
+            }
+
         }
 
         public override Color? GetAlpha(Color lightColor)

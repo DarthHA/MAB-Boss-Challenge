@@ -121,7 +121,7 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
                     {
                         for (int i = 0; i < 24; i++)
                         {
-                            Vector2 RandomVel = PortalUtils.GetRandomUnit() * (9 + Main.rand.Next(9));
+                            Vector2 RandomVel = PortalUtils.GetRandomUnit() * (10 + Main.rand.Next(9));
                             Projectile.NewProjectile(projectile.Center, RandomVel, ModContent.ProjectileType<WarpLaserRewind>(), projectile.damage, 0);
                         }
                     }

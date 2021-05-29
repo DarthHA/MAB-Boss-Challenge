@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace MABBossChallenge.Projectiles.EchDestroyer
@@ -39,7 +40,11 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
                 return;
             }
             projectile.localAI[0]++;
-            if (projectile.localAI[0] > 30)
+            if (projectile.localAI[0] == 30)
+            {
+                Main.PlaySound(SoundID.Item12, projectile.Center);
+            }
+            if (projectile.localAI[0] > 50)
             {
                 projectile.Kill();
                 return;
@@ -61,7 +66,8 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
             {
                 return false;
             }
-            float k = (float)Math.Sin(projectile.localAI[0] / 30 * MathHelper.Pi);
+            float k = (float)Math.Sin((projectile.localAI[0] - 30) / 20 * MathHelper.Pi);
+            if (projectile.localAI[0] < 30) k = 0;
             Terraria.Utils.DrawLine(spriteBatch, A, B, Color.Cyan * k, Color.White * k, 2);
             return false;
         }

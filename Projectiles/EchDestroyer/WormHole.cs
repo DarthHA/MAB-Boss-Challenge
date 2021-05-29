@@ -11,6 +11,7 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
 {
     public class WormHole : ModProjectile
     {
+        private int IsEnter = 0;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Worm Hole");
@@ -38,6 +39,17 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
 
         public override void AI()
         {
+            if (IsEnter == 0)
+            {
+                if (PortalUtils.FindNumByHole(projectile.whoAmI) % 2 == 0)
+                {
+                    IsEnter = 1;
+                }
+                else
+                {
+                    IsEnter = 2;
+                }
+            }
             if (!NPC.AnyNPCs(ModContent.NPCType<EchDestroyerHead>()))
             {
                 if (projectile.timeLeft > 120)
@@ -188,6 +200,8 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
         public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
         {
             Texture2D texture2D13 = Main.projectileTexture[projectile.type];
+            if (IsEnter == 1)
+                texture2D13 = mod.GetTexture("Projectiles/EchDestroyer/WormHoleAlt");
             int num156 = Main.projectileTexture[projectile.type].Height / Main.projFrames[projectile.type]; //ypos of lower right corner of sprite to draw
             int y3 = num156 * projectile.frame; //ypos of upper left corner of sprite to draw
             Rectangle rectangle = new Rectangle(0, y3, texture2D13.Width, num156);
@@ -196,6 +210,7 @@ namespace MABBossChallenge.Projectiles.EchDestroyer
             Main.spriteBatch.Draw(texture2D13, projectile.Center - Main.screenPosition + new Vector2(0f, projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), projectile.GetAlpha(lightColor), projectile.rotation, origin2, projectile.scale, SpriteEffects.None, 0f);
             return false;
         }
+
         public override bool ShouldUpdatePosition()
         {
             return false;
