@@ -299,7 +299,7 @@ namespace MABBossChallenge.NPCs.EchDestroyer
 
         public override void ModifyHitByItem(Player player, Item item, ref int damage, ref float knockback, ref bool crit)
         {
-            damage /= 4;
+            damage /= 6;
         }
 
 
@@ -331,15 +331,11 @@ namespace MABBossChallenge.NPCs.EchDestroyer
 
         public override void ModifyHitByProjectile(Projectile projectile, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            damage /= 4;
+            damage /= 6;
             if (projectile.penetrate == -1 && !projectile.minion && projectile.aiStyle != 99) 
             {
                 projectile.maxPenetrate = 4;
                 projectile.penetrate = 4;
-            }
-            if (projectile.minion)
-            {
-                damage = (int)(damage * 0.66f);
             }
         }
 

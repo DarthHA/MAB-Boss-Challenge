@@ -18,7 +18,7 @@ namespace MABBossChallenge.NPCs.EchDestroyer
     {
         public const int Length = 25;
         public readonly int TPDistance = 30;
-        public readonly static int RageDistance = 3000;
+        public readonly static int RageDistance = 3500;
         public readonly int CoilingRadius = 200;
 
 
@@ -126,6 +126,7 @@ namespace MABBossChallenge.NPCs.EchDestroyer
             RamReady,             //准备碎片冲刺
             Raming,               //碎片冲刺
             TpAndRam,              //TP冲刺
+            TpAndRam2,            //TP冲刺2
             CircleRam,            //TP绕圈冲刺
             TpLaser,              //TP激光
             DSRay,                 //死星射线
@@ -466,16 +467,12 @@ namespace MABBossChallenge.NPCs.EchDestroyer
         }
         public override void ModifyHitByItem(Player player, Item item, ref int damage, ref float knockback, ref bool crit)
         {
-            damage /= 4;
+            damage /= 6;
         }
 
         public override void ModifyHitByProjectile(Projectile projectile, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            damage /= 4;
-            if (projectile.minion)
-            {
-                damage = (int)(damage * 0.66f);
-            }
+            damage /= 6;
         }
 
         public override bool PreNPCLoot()
@@ -525,7 +522,7 @@ namespace MABBossChallenge.NPCs.EchDestroyer
         /// <param name="Target"></param>
         public void NormalMoveAI(Player Target)
         {
-            if (CurrentStage == 0 && npc.life < npc.lifeMax * 0.66f)
+            if (CurrentStage == 0 && npc.life < npc.lifeMax * 0.8f)
             {
                 ShouldTransform = true;
                 SwitchImmume(true);
@@ -581,13 +578,13 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                 {
                     if (CurrentStage == 1)
                     {
-                        Vector2 AimPos = Target.Center + Target.velocity * 20;
+                        Vector2 AimPos = Target.Center + Target.velocity * 25;
                         ExtraAI[0] = AimPos.X;
                         ExtraAI[1] = AimPos.Y;
                     }
                     else
                     {
-                        Vector2 AimPos = Target.Center + Target.velocity * 25;
+                        Vector2 AimPos = Target.Center + Target.velocity * 30;
                         ExtraAI[0] = AimPos.X;
                         ExtraAI[1] = AimPos.Y;
                     }
@@ -610,13 +607,12 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                 if (Timer == 5)
                 {
                     Projectile.NewProjectile(npc.Center, Vector2.Normalize(npc.velocity) / 1000, ModContent.ProjectileType<WarpCrack>(), npc.damage / 4, 0);
-                    /*
+
                     if (CurrentStage == 1)
                     {
                         Projectile.NewProjectile(npc.Center, (npc.velocity.ToRotation() + MathHelper.Pi / 10).ToRotationVector2() / 1000, ModContent.ProjectileType<WarpCrack>(), npc.damage / 4, 0);
                         Projectile.NewProjectile(npc.Center, (npc.velocity.ToRotation() - MathHelper.Pi / 10).ToRotationVector2() / 1000, ModContent.ProjectileType<WarpCrack>(), npc.damage / 4, 0);
                     }
-                    */
                 }
 
                 Vector2 TargetPos = new Vector2(ExtraAI[0], ExtraAI[1]);
@@ -650,85 +646,124 @@ namespace MABBossChallenge.NPCs.EchDestroyer
             else if (AIState == (int)WrapAIState.TpAndRam)               //多次传送冲撞
             {
                 Timer++;
-                WormMovement(Target.Center, 24, 0.2f, 0.3f);
+                Vector2 TargetPos = Target.Center + Vector2.Normalize(npc.Center - Target.Center) * 500;
+                WormMovement(TargetPos, 24, 0.2f, 0.3f);
+
+                if (Timer == 180)
+                {
+                    int protmp = Projectile.NewProjectile(Target.Center, Vector2.Zero, ModContent.ProjectileType<WormHoleMinion>(), npc.damage / 4, 0);
+                    Main.projectile[protmp].rotation = Main.rand.NextFloat() * MathHelper.TwoPi;
+                    ExtraAI[0] = Main.rand.Next(2) * 2 - 1;
+                }
                 if (Timer > 180)
                 {
-                    if ((npc.Distance(Target.Center) > 400 && PointMulti(npc.velocity, Target.Center - npc.Center) < 0) || npc.Distance(Target.Center) > 1500)
+                    if (WormHoleMinion.FindFirstMinion() != -1)
                     {
-                        if (ExtraAI[2] == 0)
+                        if (Timer < 210)
                         {
-                            Vector2 RandomPos = Target.Center + Target.velocity * 20 + PortalUtils.GetRandomUnit() * 700;
-                            ExtraAI[0] = RandomPos.X;
-                            ExtraAI[1] = RandomPos.Y;
-                            ExtraAI[2] = 1;
+                            (Main.projectile[WormHoleMinion.FindFirstMinion()].modProjectile as WormHoleMinion).RotSpeed = MathHelper.Pi / 40 * (Timer - 180) / 30 * ExtraAI[0];
                         }
-                    }
-                    if (ExtraAI[2] > 0)
-                    {
-                        ExtraAI[2]++;
-                        Vector2 RandomPos = new Vector2(ExtraAI[0], ExtraAI[1]);
-                        if (Main.rand.Next(2) == 0)
+                        else if (Timer < 240)
                         {
-                            Vector2 spinningpoint = Vector2.UnitY.RotatedByRandom(MathHelper.TwoPi);
-                            Dust dust = Main.dust[Dust.NewDust(RandomPos - spinningpoint * 30f, 0, 0, 229, 0.0f, 0.0f, 0, new Color(), 1f)];
-                            dust.noGravity = true;
-                            dust.position = RandomPos - spinningpoint * Main.rand.Next(10, 21);
-                            dust.velocity = spinningpoint.RotatedBy(MathHelper.Pi / 2, new Vector2()) * 5f;
-                            dust.scale = 0.5f + Main.rand.NextFloat();
-                            dust.fadeIn = 0.5f;
-                            dust.customData = RandomPos;
-                            dust.color = Color.LightBlue;
+                            (Main.projectile[WormHoleMinion.FindFirstMinion()].modProjectile as WormHoleMinion).RotSpeed = MathHelper.Pi / 40 * ExtraAI[0];
                         }
-                        else
+                        else if (Timer < 360)
                         {
-                            Vector2 spinningpoint = Vector2.UnitY.RotatedByRandom(MathHelper.TwoPi);
-                            Dust dust = Main.dust[Dust.NewDust(RandomPos - spinningpoint * 30f, 0, 0, 240, 0.0f, 0.0f, 0, new Color(), 1f)];
-                            dust.noGravity = true;
-                            dust.position = RandomPos - spinningpoint * 30f;
-                            dust.velocity = spinningpoint.RotatedBy(-MathHelper.Pi / 2, new Vector2()) * 2.5f;
-                            dust.scale = 0.5f + Main.rand.NextFloat();
-                            dust.fadeIn = 0.5f;
-                            dust.customData = RandomPos;
-                            dust.color = Color.LightBlue;
-                            dust.color = Color.LightBlue;
+                            (Main.projectile[WormHoleMinion.FindFirstMinion()].modProjectile as WormHoleMinion).RotSpeed = MathHelper.Pi / 40 * (360 - Timer) / 120 * ExtraAI[0];
                         }
-                        if (Main.rand.Next(2) == 0)
+                        if (Timer == 360)
                         {
-                            Dust dust3 = Main.dust[Dust.NewDust(RandomPos, 1, 1, 229, 0f, 0f, 0, new Color(), 1f)];
-                            dust3.velocity *= 5f;
-                            dust3.fadeIn = 1f;
-                            dust3.scale = 0.5f + Main.rand.NextFloat();
-                            dust3.noGravity = true;
-                            dust3.color = Color.LightBlue;
-                        }
+                            Vector2 Pos = Target.Center + Main.projectile[WormHoleMinion.FindFirstMinion()].rotation.ToRotationVector2() * WormHoleMinion.Radius;
+                            Projectile.NewProjectile(npc.Center + Vector2.Normalize(npc.velocity) * 400, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
+                            int protmp = Projectile.NewProjectile(Pos, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
+                            Main.projectile[protmp].ai[0] = 26;
 
-                        if (ExtraAI[2] == 2)
-                        {
-                            float len = npc.Distance(RandomPos);
-                            for (int i = 0; i < len / 8; i++)
-                            {
-                                Vector2 DustPos = npc.Center + Vector2.Normalize(RandomPos - npc.Center) * Main.rand.Next((int)len);
-                                Dust dust = Dust.NewDustDirect(DustPos, 0, 0, MyDustId.PurpleShortFx, 0, 0, 0, default, 1.1f);
-                                dust.noGravity = true;
-                                dust.fadeIn = 0.5f;
-                            }
-                        }
-                    }
-                    if (ExtraAI[2] > 30)
-                    {
-                        Vector2 RandomPos = new Vector2(ExtraAI[0], ExtraAI[1]);
+                            Pos = Target.Center + (Main.projectile[WormHoleMinion.FindFirstMinion()].rotation + MathHelper.TwoPi / 3).ToRotationVector2() * WormHoleMinion.Radius;
+                            protmp = Projectile.NewProjectile(Pos, Vector2.Zero, ModContent.ProjectileType<WormHoleSentry1>(), 0, 0);
+                            Main.projectile[protmp].timeLeft = 120;
 
-                        Projectile.NewProjectile(npc.Center + Vector2.Normalize(npc.velocity) * 450, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
-                        Projectile.NewProjectile(RandomPos, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
-                        InitTeleporting();
-                        ExtraAI[0] = 0;
-                        ExtraAI[1] = 0;
-                        ExtraAI[2] = 0;
+                            Pos = Target.Center + (Main.projectile[WormHoleMinion.FindFirstMinion()].rotation + MathHelper.TwoPi / 3 * 2).ToRotationVector2() * WormHoleMinion.Radius;
+                            protmp = Projectile.NewProjectile(Pos, Vector2.Zero, ModContent.ProjectileType<WormHoleSentry1>(), 0, 0);
+                            Main.projectile[protmp].timeLeft = 120;
+                            InitTeleporting();
+
+                            Main.projectile[WormHoleMinion.FindFirstMinion()].Kill();
+                        }
                     }
                 }
 
-            }
 
+            }
+            else if (AIState == (int)WrapAIState.TpAndRam2)             //多次传送W冲刺
+            {
+                Timer++;
+                WormMovement(Target.Center, 24, 0.2f, 0.3f);
+                if (Timer == 180)
+                {
+                    Vector2 RandomPos = Target.Center + Target.velocity * 20 + PortalUtils.GetRandomUnit() * 800;
+                    ExtraAI[0] = RandomPos.X;
+                    ExtraAI[1] = RandomPos.Y;
+
+                    Projectile.NewProjectile(npc.Center + Vector2.Normalize(npc.velocity) * 400, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
+                    Projectile.NewProjectile(RandomPos, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
+
+                    float Rot = (Target.Center - RandomPos).ToRotation();
+                    float Width = 150;
+                    float Height = 600;
+                    for (int i = 1; i < 10; i++)
+                    {
+                        float dir = 1;
+                        if (i % 2 == 1)
+                        {
+                            dir = -1;
+                        }
+                        Vector2 VertUnit = dir * (Rot + MathHelper.Pi / 2).ToRotationVector2();
+                        Vector2 Unit = Rot.ToRotationVector2();
+                        Vector2 Pos = RandomPos + Unit * Width * i + VertUnit * Height;
+                        Projectile.NewProjectile(Pos, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
+                        Projectile.NewProjectile(Pos, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
+                        //RamMarker.SummonMark(Pos);
+                    }
+                    InitTeleporting();
+                }
+
+                if (Timer == 280)
+                {
+                    SwitchAIState((int)WrapAIState.TpAndRam);
+                    ExtraAI[0] = 0;
+                    ExtraAI[1] = 0;
+                }
+
+                /*
+                if (Timer == 240)
+                {
+                    Vector2 RandomPos = new Vector2(ExtraAI[0], ExtraAI[1]);
+                    Projectile.NewProjectile(npc.Center + Vector2.Normalize(npc.velocity) * 400, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
+                    Projectile.NewProjectile(RandomPos, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
+                    InitTeleporting();
+                }
+
+                /*
+                if (Timer > 240)
+                {
+                    int vel = 50;
+                    if (RamMarker.GetMarkPos() != Vector2.Zero)
+                    {
+                        PortalUtils.DirectMovement(this, RamMarker.GetMarkPos(), vel);
+                        if(npc.Distance(RamMarker.GetMarkPos()) < vel)
+                        {
+                            RamMarker.KillMark();
+                        }
+                    }
+                    else
+                    {
+                        SwitchAIState((int)WrapAIState.TpAndRam2);
+                        ExtraAI[0] = 0;
+                        ExtraAI[1] = 0;
+                    }
+                }
+                */
+            }
             else if (AIState == (int)WrapAIState.CircleRam)             //TP乱窜（bushi
             {
                 Timer++;
@@ -755,14 +790,23 @@ namespace MABBossChallenge.NPCs.EchDestroyer
             else if (AIState == (int)WrapAIState.TpLaser)            //tp弹幕攻击
             {
                 Timer++;
+                if (ExtraCounter != 0)
+                {
+                    npc.velocity *= 0.96f;
+                }
                 if (Timer == 101)
                 {
-                    ExtraAI[0] = Target.velocity.ToRotation();
-                    if (Target.velocity == Vector2.Zero)
-                    {
-                        ExtraAI[0] = Main.rand.NextFloat() * MathHelper.TwoPi;
-                    }
+
+                    ExtraAI[0] = Main.rand.NextFloat() * MathHelper.TwoPi;
+                    
                     ExtraAI[1] = Main.rand.Next(2) * 2 - 1;
+                    int cap = 3;
+                    if (CurrentStage == 1)
+                    {
+                        cap = 2;
+                    }
+                    ExtraAI[2] = Main.rand.Next(16 - cap) + 3;           //total 18  Rand(20-cap)
+                    ExtraAI[3] = 0;
                     Vector2 TpPos = ExtraAI[0].ToRotationVector2() * 500 + (ExtraAI[0] + ExtraAI[1] * MathHelper.Pi / 2).ToRotationVector2() * 600;
                     Projectile.NewProjectile(npc.Center + Vector2.Normalize(npc.velocity) * 400, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
                     Projectile.NewProjectile(Target.Center + TpPos, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
@@ -784,7 +828,7 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                     }
                     else
                     {
-                        Timer = 100;
+                        Timer = 40;
                     }
                     ExtraAI[0] = 0;
                     ExtraAI[1] = 0;
@@ -793,6 +837,10 @@ namespace MABBossChallenge.NPCs.EchDestroyer
             else if (AIState == (int)WrapAIState.DSRay)           //死星镭射（？
             {
                 Timer++;
+                if (Timer < 100)
+                {
+                    WormMovement(Target.Center, 12, 0.15f, 0.3f);
+                }
                 if (Timer == 100)
                 {
                     Vector2 TpPos = Target.Center + PortalUtils.GetRandomUnit() * 400;
@@ -800,8 +848,13 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                     ExtraAI[1] = TpPos.Y;
                     ExtraAI[2] = Main.rand.Next(2) * 2 - 1;
                     TpPos -= new Vector2(0, CoilingRadius);
+                    Vector2 TpPos2 = npc.Center + Vector2.Normalize(npc.velocity) * 400;
+                    if (Vector2.Distance(TpPos2, TpPos) <= 300)
+                    {
+                        TpPos2 = TpPos + Vector2.Normalize(TpPos2 - TpPos) * 300;
+                    }
                     Projectile.NewProjectile(InScreenPos(new Vector2(ExtraAI[0], ExtraAI[1])), Vector2.Zero, ModContent.ProjectileType<ShockwaveCenter>(), 0, 0);
-                    Projectile.NewProjectile(npc.Center + Vector2.Normalize(npc.velocity) * 400, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
+                    Projectile.NewProjectile(TpPos2, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
                     Projectile.NewProjectile(TpPos, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
                     InitTeleporting();
                 }
@@ -861,7 +914,11 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                 Timer++;
                 Vector2 MovePos = Target.Center + Vector2.Normalize(npc.Center - Target.Center) * 600;
                 WormMovement(MovePos, 18, 0.2f, 0.3f);   //80-130
-                if (Timer == 80) TransBG = true;
+                if (Timer == 80) 
+                {
+                    Main.PlaySound(SoundID.Item113, Target.Center);
+                    TransBG = true; 
+                }
                 float progress = Terraria.Utils.Clamp((Timer - 80) / 50f, 0, 1);
                 progress = (float)Math.Sin(progress * MathHelper.Pi);
                 if (!Filters.Scene["MABBossChallenge:WarpEffect"].IsActive())
@@ -873,8 +930,8 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                 {
                     SwitchImmume(false);
                     CurrentStage = 1;
-                    SwitchAIState((int)WrapAIState.LaserRewind);
                     Filters.Scene["MABBossChallenge:WarpEffect"].Deactivate();
+                    SwitchAIState((int)WrapAIState.LaserRewind);                  //WrapAIState.LaserRewind
                 }
             }
             else if (AIState == (int)WrapAIState.Mirror)              //镜像AI
@@ -918,13 +975,19 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                     ExtraAI[1] = TpPos.Y;
                     ExtraAI[2] = Main.rand.Next(2) * 2 - 1;
                     TpPos -= new Vector2(0, CoilingRadius);
+
+                    Vector2 TpPos2 = npc.Center + Vector2.Normalize(npc.velocity) * 400;
+                    if (Vector2.Distance(TpPos2, TpPos) <= 300)
+                    {
+                        TpPos2 = TpPos + Vector2.Normalize(TpPos2 - TpPos) * 300;
+                    }
                     Projectile.NewProjectile(InScreenPos(new Vector2(ExtraAI[0], ExtraAI[1])), Vector2.Zero, ModContent.ProjectileType<ShockwaveCenter>(), 0, 0);
-                    Projectile.NewProjectile(npc.Center + Vector2.Normalize(npc.velocity) * 400, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
+                    Projectile.NewProjectile(TpPos2, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
                     Projectile.NewProjectile(TpPos, Vector2.Zero, ModContent.ProjectileType<WormHole>(), 0, 0);
                     InitTeleporting();
                 }
 
-                if (Timer >= 102 && Timer < 210)
+                if (Timer >= 102 && Timer < 770)           //210
                 {
                     Vector2 Center = new Vector2(ExtraAI[0], ExtraAI[1]);
                     npc.velocity = ((Center - npc.Center).ToRotation() - MathHelper.Pi / 2 * ExtraAI[2]).ToRotationVector2() * 20;
@@ -943,7 +1006,7 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                         }
                     }
                 }
-                else if (Timer >= 210)
+                else if (Timer >= 770)
                 {
                     WormMovement(Target.Center, 14f, 0.25f, 0.4f);
                 }
@@ -952,8 +1015,9 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                     Vector2 Center = new Vector2(ExtraAI[0], ExtraAI[1]);
                     int dir = Math.Sign(Target.Center.X - npc.Center.X);
                     Projectile.NewProjectile(Center, new Vector2(dir, 0), ModContent.ProjectileType<KyberCrystal2>(), npc.damage / 4, 0, default, npc.whoAmI);
+                    Projectile.NewProjectile(Center, Vector2.Zero, ModContent.ProjectileType<WarpArena3>(), 0, 0);
                 }
-                if (Timer == 750)
+                if (Timer == 690)            //750
                 {
                     foreach (Projectile kyber in Main.projectile)
                     {
@@ -964,9 +1028,22 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                         }
                     }
                 }
-                if (Timer >= 790)
+                if (Timer == 710)
                 {
-                    SwitchAIState((int)WrapAIState.LaserRewind);
+                    foreach (Projectile sphere in Main.projectile)
+                    {
+                        if (sphere.active && sphere.type == ModContent.ProjectileType<WarpSphere2>())
+                        {
+                            if (sphere.localAI[0] < 241)
+                            {
+                                sphere.localAI[0] = 241;
+                            }
+                        }
+                    }
+                }
+                if (Timer >= 730)            //790
+                {
+                    SwitchAIState((int)WrapAIState.LaserRewind);       //WrapAIState.LaserRewind
                     ExtraAI[0] = 0;
                     ExtraAI[1] = 0;
                     ExtraAI[2] = 0;
@@ -982,7 +1059,7 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                     Projectile.NewProjectile(Target.Center, Vector2.Zero, ModContent.ProjectileType<WarpArena2>(), 0, 0);
                 }
                 Vector2 MoveTarget = Target.Center + Vector2.Normalize(npc.Center - Target.Center) * 200;
-                WormMovement(MoveTarget, 16f, 0.4f, 0.4f);
+                WormMovement(MoveTarget, 16f, 0.45f, 0.45f);
                 if (Timer == 100 || Timer == 140 || Timer == 180 || Timer == 220 || Timer == 260)
                 {
                     for (int i = 0; i < 40; i++)
@@ -1036,7 +1113,7 @@ namespace MABBossChallenge.NPCs.EchDestroyer
         /// <param name="Target"></param>
         public void TelePortingAI(Player Target)
         {
-            if (CurrentStage == 0 && npc.life < npc.lifeMax * 0.66f)
+            if (CurrentStage == 0 && npc.life < npc.lifeMax * 0.8f)
             {
                 SwitchImmume(true);
                 ShouldTransform = true;
@@ -1052,7 +1129,28 @@ namespace MABBossChallenge.NPCs.EchDestroyer
             }
             else if (AIState == (int)WrapAIState.TpAndRam)
             {
-                WormMovement(Target.Center, 20, 0.25f, 0.35f);
+                WormMovement(Target.Center, 20, 0.2f, 0.3f);
+            }
+            else if (AIState == (int)WrapAIState.TpAndRam2)
+            {
+                WormMovement(Target.Center, 24, 0.2f, 0.3f);
+                /*
+                int vel = 50;
+                if (RamMarker.GetMarkPos() != Vector2.Zero)
+                {
+                    PortalUtils.DirectMovement(this, RamMarker.GetMarkPos(), vel);
+                    if (npc.Distance(RamMarker.GetMarkPos()) < vel)
+                    {
+                        RamMarker.KillMark();
+                    }
+                }
+                else
+                {
+                    SwitchAIState((int)WrapAIState.TpAndRam2);
+                    ExtraAI[0] = 0;
+                    ExtraAI[1] = 0;
+                }
+                */
             }
             else if (AIState == (int)WrapAIState.CircleRam)
             {
@@ -1064,16 +1162,18 @@ namespace MABBossChallenge.NPCs.EchDestroyer
                 Vector2 MoveDir = (ExtraAI[0] - ExtraAI[1] * MathHelper.Pi / 2).ToRotationVector2();
                 npc.velocity = MoveDir * 30;
                 Timer++;
-                int cap = 4;
-                int type = ModContent.ProjectileType<WarpBolt>();
-                if (CurrentStage == 1) 
+                int cap = 2;
+                if (CurrentStage == 1)
                 {
-                    type = ModContent.ProjectileType<WarpBolt2>();
-                    cap = 3;
+                    cap = 1;
                 }
-                if (Timer % cap == 2)
+                if (Timer % 2 == 1)
                 {
-                    Projectile.NewProjectile(npc.Center, -ExtraAI[0].ToRotationVector2(), type, npc.damage / 4, 0);
+                    ExtraAI[3]++;
+                    if (ExtraAI[3] < ExtraAI[2] || ExtraAI[3] > ExtraAI[2] + cap)
+                    {
+                        Projectile.NewProjectile(npc.Center, -ExtraAI[0].ToRotationVector2(), ModContent.ProjectileType<WarpBolt>(), npc.damage / 4, 0);
+                    }
                 }
             }
             else if (AIState == (int)WrapAIState.DSRay)
@@ -1127,15 +1227,22 @@ namespace MABBossChallenge.NPCs.EchDestroyer
             {
                 SwitchAIState((int)WrapAIState.TpLaser);
             }
+            else if (AIState == (int)WrapAIState.TpLaser)
+            {
+                ExtraAI[2] = 0;
+                ExtraAI[3] = 0;
+            }
             else if (AIState == (int)WrapAIState.TpAndRam)
             {
                 if (++ExtraCounter > 3)
                 {
+                    ExtraAI[0] = 0;
                     ExtraCounter = 0;
-                    SwitchAIState((int)WrapAIState.LaserNormal);
+                    SwitchAIState((int)WrapAIState.LaserNormal);             //WrapAIState.LaserNormal
                 }
                 else
                 {
+                    ExtraAI[0] = 0;
                     Timer = 120;
                 }
             }
@@ -1152,6 +1259,10 @@ namespace MABBossChallenge.NPCs.EchDestroyer
             {
                 speed = 30;
             }
+            else if (AIState == (int)WrapAIState.TpAndRam2)
+            {
+                speed = 80;
+            }
         }
 
         public void SpecialAIForCircle()
@@ -1160,7 +1271,6 @@ namespace MABBossChallenge.NPCs.EchDestroyer
             {
                 if (PortalUtils.FindHoleByNum(HolePassing + 2) != -1)
                 {
-                    Main.PlaySound(SoundID.Item12, Main.player[npc.target].Center);
                     Projectile.NewProjectile(npc.Center, Vector2.Zero, ModContent.ProjectileType<TPCircleIndicator>(), 0, 0, default, HolePassing + 1);
                 }
             }
