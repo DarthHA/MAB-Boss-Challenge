@@ -202,11 +202,12 @@ namespace MABBossChallenge.NPCs.EchDestroyer
             else
             {
                 Projectile Hole1 = Main.projectile[PortalUtils.FindHoleByNum(HolePassing)];
-                this.DirectMovementSeg(Hole1.Center, head.velocity.Length());
+                Projectile Hole2 = Main.projectile[PortalUtils.FindHoleByNum(HolePassing)];
+                //this.DirectMovementSeg(Hole1.Center, head.velocity.Length());
+                npc.Center = npc.DirectionFrom(Hole1.Center) * (head.Center - PreviousSeg.Center).Length();
                 if (npc.Distance(Hole1.Center) <= TPDistance)
                 {
                     HolePassing++;
-                    Projectile Hole2 = Main.projectile[PortalUtils.FindHoleByNum(HolePassing)];
                     npc.Center = Hole2.Center;
                     HolePassing++;
                 }
